@@ -1,8 +1,8 @@
 {
   "name": "com.besty.unity-skills",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "displayName": "UnitySkills",
-  "description": "AI-powered Unity Editor control via REST API and MCP. Features both simplified Skills REST endpoints and full MCP toolset for automated scene manipulation, asset management, and script editing.",
+  "description": "AI-powered Unity Editor control via REST API. Features 70+ Skills for scene, asset, prefab, script, material management with Chinese/English UI and one-click AI tool configuration.",
   "unity": "2021.3",
   "documentationUrl": "https://github.com/Besty0728/unity-mcp-skill",
   "licensesUrl": "https://github.com/Besty0728/unity-mcp-skill/blob/main/LICENSE",

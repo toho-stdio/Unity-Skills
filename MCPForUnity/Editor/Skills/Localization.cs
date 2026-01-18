@@ -1,0 +1,235 @@
+using System.Collections.Generic;
+
+namespace UnitySkills
+{
+    /// <summary>
+    /// Localization for UnitySkills.
+    /// </summary>
+    public static class Localization
+    {
+        public enum Language { English, Chinese }
+        
+        private static Language _current = Language.English;
+        public static Language Current
+        {
+            get => _current;
+            set => _current = value;
+        }
+
+        public static string Get(string key)
+        {
+            if (_current == Language.Chinese && _chinese.TryGetValue(key, out var cn))
+                return cn;
+            if (_english.TryGetValue(key, out var en))
+                return en;
+            return key;
+        }
+
+        // UI Strings
+        private static readonly Dictionary<string, string> _english = new Dictionary<string, string>
+        {
+            // Window
+            {"window_title", "UnitySkills"},
+            {"server_running", "● Server Running"},
+            {"server_stopped", "● Server Stopped"},
+            {"start_server", "Start Server"},
+            {"stop_server", "Stop Server"},
+            {"test_skill", "Test Skill"},
+            {"skill_name", "Skill Name"},
+            {"parameters_json", "Parameters (JSON)"},
+            {"execute_skill", "Execute Skill"},
+            {"result", "Result"},
+            {"available_skills", "Available Skills"},
+            {"refresh", "Refresh"},
+            {"total_skills", "Total: {0} skills in {1} categories"},
+            {"use", "Use"},
+            {"language", "Language"},
+            
+            // Skill Configuration
+            {"skill_config", "AI Skill Configuration"},
+            {"claude_code", "Claude Code"},
+            {"antigravity", "Antigravity"},
+            {"install_project", "Install to Project"},
+            {"install_global", "Install Global"},
+            {"installed", "✓ Installed"},
+            {"not_installed", "Not installed"},
+            {"install_success", "Skill installed successfully!"},
+            {"install_failed", "Installation failed: {0}"},
+            
+            // Skill descriptions
+            {"scene_create", "Create a new empty scene"},
+            {"scene_load", "Load an existing scene"},
+            {"scene_save", "Save the current scene"},
+            {"scene_get_info", "Get current scene information"},
+            {"scene_get_hierarchy", "Get scene hierarchy tree"},
+            {"scene_screenshot", "Capture a screenshot of the scene view"},
+            {"gameobject_create", "Create a new GameObject"},
+            {"gameobject_delete", "Delete a GameObject by name or instance ID"},
+            {"gameobject_find", "Find GameObjects by name, tag, or component"},
+            {"gameobject_set_transform", "Set position, rotation, or scale of a GameObject"},
+            {"gameobject_duplicate", "Duplicate a GameObject"},
+            {"gameobject_set_parent", "Set the parent of a GameObject"},
+            {"component_add", "Add a component to a GameObject"},
+            {"component_remove", "Remove a component from a GameObject"},
+            {"component_list", "List all components on a GameObject"},
+            {"component_set_property", "Set a property on a component"},
+            {"component_get_properties", "Get all properties of a component"},
+            {"material_create", "Create a new material"},
+            {"material_set_color", "Set a color property on a material or renderer"},
+            {"material_set_texture", "Set a texture on a material"},
+            {"material_assign", "Assign a material asset to a renderer"},
+            {"material_set_float", "Set a float property on a material"},
+            {"asset_import", "Import an asset from external path"},
+            {"asset_delete", "Delete an asset"},
+            {"asset_move", "Move or rename an asset"},
+            {"asset_duplicate", "Duplicate an asset"},
+            {"asset_find", "Find assets by name, type, or label"},
+            {"asset_create_folder", "Create a new folder in Assets"},
+            {"asset_refresh", "Refresh the Asset Database"},
+            {"asset_get_info", "Get information about an asset"},
+            {"editor_play", "Enter play mode"},
+            {"editor_stop", "Exit play mode"},
+            {"editor_pause", "Pause/unpause play mode"},
+            {"editor_select", "Select a GameObject"},
+            {"editor_get_selection", "Get currently selected objects"},
+            {"editor_undo", "Undo the last action"},
+            {"editor_redo", "Redo the last undone action"},
+            {"editor_get_state", "Get current editor state"},
+            {"editor_execute_menu", "Execute a Unity menu item"},
+            {"editor_get_tags", "Get all available tags"},
+            {"editor_get_layers", "Get all available layers"},
+            {"prefab_create", "Create a prefab from a GameObject"},
+            {"prefab_instantiate", "Instantiate a prefab in the scene"},
+            {"prefab_apply", "Apply changes from instance to prefab"},
+            {"prefab_unpack", "Unpack a prefab instance"},
+            {"script_create", "Create a new C# script"},
+            {"script_read", "Read the contents of a script"},
+            {"script_delete", "Delete a script file"},
+            {"script_find_in_file", "Search for pattern in scripts"},
+            {"script_append", "Append content to a script"},
+            {"console_start_capture", "Start capturing console logs"},
+            {"console_stop_capture", "Stop capturing console logs"},
+            {"console_get_logs", "Get captured console logs"},
+            {"console_clear", "Clear the Unity console"},
+            {"console_log", "Write a message to the console"},
+            {"scriptableobject_create", "Create a new ScriptableObject asset"},
+            {"scriptableobject_get", "Get properties of a ScriptableObject"},
+            {"scriptableobject_set", "Set a field/property on a ScriptableObject"},
+            {"scriptableobject_list_types", "List available ScriptableObject types"},
+            {"scriptableobject_duplicate", "Duplicate a ScriptableObject asset"},
+            {"shader_create", "Create a new shader file"},
+            {"shader_read", "Read shader source code"},
+            {"shader_list", "List all shaders in project"},
+            {"shader_get_properties", "Get properties of a shader"},
+            {"shader_find", "Find shaders by name"},
+            {"shader_delete", "Delete a shader file"},
+            {"test_run", "Run Unity tests (returns job ID for polling)"},
+            {"test_get_result", "Get the result of a test run"},
+            {"test_list", "List available tests"},
+            {"test_cancel", "Cancel a running test"},
+        };
+
+        private static readonly Dictionary<string, string> _chinese = new Dictionary<string, string>
+        {
+            // Window
+            {"window_title", "UnitySkills"},
+            {"server_running", "● 服务器运行中"},
+            {"server_stopped", "● 服务器已停止"},
+            {"start_server", "启动服务器"},
+            {"stop_server", "停止服务器"},
+            {"test_skill", "测试 Skill"},
+            {"skill_name", "Skill 名称"},
+            {"parameters_json", "参数 (JSON)"},
+            {"execute_skill", "执行 Skill"},
+            {"result", "结果"},
+            {"available_skills", "可用 Skills"},
+            {"refresh", "刷新"},
+            {"total_skills", "共 {0} 个 Skills，{1} 个分类"},
+            {"use", "使用"},
+            {"language", "语言"},
+            
+            // Skill Configuration
+            {"skill_config", "AI Skill 配置"},
+            {"claude_code", "Claude Code"},
+            {"antigravity", "Antigravity"},
+            {"install_project", "安装到项目"},
+            {"install_global", "全局安装"},
+            {"installed", "✓ 已安装"},
+            {"not_installed", "未安装"},
+            {"install_success", "Skill 安装成功！"},
+            {"install_failed", "安装失败：{0}"},
+            
+            // Skill descriptions
+            {"scene_create", "创建新的空场景"},
+            {"scene_load", "加载已有场景"},
+            {"scene_save", "保存当前场景"},
+            {"scene_get_info", "获取当前场景信息"},
+            {"scene_get_hierarchy", "获取场景层级树"},
+            {"scene_screenshot", "截取场景视图截图"},
+            {"gameobject_create", "创建新的游戏对象"},
+            {"gameobject_delete", "按名称或实例ID删除游戏对象"},
+            {"gameobject_find", "按名称、标签或组件查找游戏对象"},
+            {"gameobject_set_transform", "设置游戏对象的位置、旋转或缩放"},
+            {"gameobject_duplicate", "复制游戏对象"},
+            {"gameobject_set_parent", "设置游戏对象的父级"},
+            {"component_add", "向游戏对象添加组件"},
+            {"component_remove", "从游戏对象移除组件"},
+            {"component_list", "列出游戏对象上的所有组件"},
+            {"component_set_property", "设置组件属性"},
+            {"component_get_properties", "获取组件的所有属性"},
+            {"material_create", "创建新材质"},
+            {"material_set_color", "设置材质或渲染器的颜色属性"},
+            {"material_set_texture", "设置材质的贴图"},
+            {"material_assign", "将材质资源分配给渲染器"},
+            {"material_set_float", "设置材质的浮点属性"},
+            {"asset_import", "从外部路径导入资源"},
+            {"asset_delete", "删除资源"},
+            {"asset_move", "移动或重命名资源"},
+            {"asset_duplicate", "复制资源"},
+            {"asset_find", "按名称、类型或标签查找资源"},
+            {"asset_create_folder", "在 Assets 中创建新文件夹"},
+            {"asset_refresh", "刷新资源数据库"},
+            {"asset_get_info", "获取资源信息"},
+            {"editor_play", "进入播放模式"},
+            {"editor_stop", "退出播放模式"},
+            {"editor_pause", "暂停/继续播放模式"},
+            {"editor_select", "选中游戏对象"},
+            {"editor_get_selection", "获取当前选中的对象"},
+            {"editor_undo", "撤销上一步操作"},
+            {"editor_redo", "重做上一步撤销的操作"},
+            {"editor_get_state", "获取编辑器当前状态"},
+            {"editor_execute_menu", "执行 Unity 菜单项"},
+            {"editor_get_tags", "获取所有可用标签"},
+            {"editor_get_layers", "获取所有可用图层"},
+            {"prefab_create", "从游戏对象创建预制体"},
+            {"prefab_instantiate", "在场景中实例化预制体"},
+            {"prefab_apply", "将实例的更改应用到预制体"},
+            {"prefab_unpack", "解包预制体实例"},
+            {"script_create", "创建新的 C# 脚本"},
+            {"script_read", "读取脚本内容"},
+            {"script_delete", "删除脚本文件"},
+            {"script_find_in_file", "在脚本中搜索模式"},
+            {"script_append", "向脚本追加内容"},
+            {"console_start_capture", "开始捕获控制台日志"},
+            {"console_stop_capture", "停止捕获控制台日志"},
+            {"console_get_logs", "获取捕获的控制台日志"},
+            {"console_clear", "清空 Unity 控制台"},
+            {"console_log", "向控制台写入消息"},
+            {"scriptableobject_create", "创建新的 ScriptableObject 资源"},
+            {"scriptableobject_get", "获取 ScriptableObject 的属性"},
+            {"scriptableobject_set", "设置 ScriptableObject 的字段/属性"},
+            {"scriptableobject_list_types", "列出可用的 ScriptableObject 类型"},
+            {"scriptableobject_duplicate", "复制 ScriptableObject 资源"},
+            {"shader_create", "创建新的 Shader 文件"},
+            {"shader_read", "读取 Shader 源代码"},
+            {"shader_list", "列出项目中的所有 Shader"},
+            {"shader_get_properties", "获取 Shader 的属性"},
+            {"shader_find", "按名称查找 Shader"},
+            {"shader_delete", "删除 Shader 文件"},
+            {"test_run", "运行 Unity 测试（返回任务ID用于轮询）"},
+            {"test_get_result", "获取测试运行结果"},
+            {"test_list", "列出可用测试"},
+            {"test_cancel", "取消正在运行的测试"},
+        };
+    }
+}

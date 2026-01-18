@@ -18,6 +18,9 @@ namespace UnitySkills
         private string _testResult = "";
         private Dictionary<string, List<SkillInfo>> _skillsByCategory;
         private Dictionary<string, bool> _categoryFoldouts = new Dictionary<string, bool>();
+        private bool _showSkillConfig = true;
+        private int _selectedTab = 0;
+        private string[] _tabNames = new[] { "Server", "Skills", "AI Config" };
 
         private class SkillInfo
         {
@@ -30,7 +33,7 @@ namespace UnitySkills
         public static void ShowWindow()
         {
             var window = GetWindow<UnitySkillsWindow>("UnitySkills");
-            window.minSize = new Vector2(400, 500);
+            window.minSize = new Vector2(450, 550);
         }
 
         private void OnEnable()
@@ -79,28 +82,56 @@ namespace UnitySkills
         {
             EditorGUILayout.Space(10);
 
-            // Header
+            // Header with language toggle
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             GUILayout.Label("UnitySkills", EditorStyles.boldLabel);
             GUILayout.FlexibleSpace();
+            
+            // Language toggle
+            var langLabel = Localization.Current == Localization.Language.English ? "EN" : "中";
+            if (GUILayout.Button(langLabel, GUILayout.Width(35)))
+            {
+                Localization.Current = Localization.Current == Localization.Language.English 
+                    ? Localization.Language.Chinese 
+                    : Localization.Language.English;
+            }
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space(5);
 
+            // Tab bar
+            _selectedTab = GUILayout.Toolbar(_selectedTab, new[] {
+                Localization.Current == Localization.Language.Chinese ? "服务器" : "Server",
+                Localization.Current == Localization.Language.Chinese ? "Skills" : "Skills",
+                Localization.Current == Localization.Language.Chinese ? "AI配置" : "AI Config"
+            });
+
+            EditorGUILayout.Space(10);
+
+            switch (_selectedTab)
+            {
+                case 0: DrawServerTab(); break;
+                case 1: DrawSkillsTab(); break;
+                case 2: DrawAIConfigTab(); break;
+            }
+        }
+
+        private void DrawServerTab()
+        {
             // Server Status
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             EditorGUILayout.BeginHorizontal();
             
             var statusStyle = new GUIStyle(EditorStyles.boldLabel);
             statusStyle.normal.textColor = _serverRunning ? Color.green : Color.red;
-            GUILayout.Label(_serverRunning ? "● Server Running" : "● Server Stopped", statusStyle);
+            GUILayout.Label(_serverRunning ? L("server_running") : L("server_stopped"), statusStyle);
             
             GUILayout.FlexibleSpace();
             
             if (_serverRunning)
             {
-                if (GUILayout.Button("Stop Server", GUILayout.Width(100)))
+                if (GUILayout.Button(L("stop_server"), GUILayout.Width(100)))
                 {
                     SkillsHttpServer.Stop();
                     _serverRunning = false;
@@ -108,7 +139,7 @@ namespace UnitySkills
             }
             else
             {
-                if (GUILayout.Button("Start Server", GUILayout.Width(100)))
+                if (GUILayout.Button(L("start_server"), GUILayout.Width(100)))
                 {
                     SkillsHttpServer.Start();
                     _serverRunning = true;
@@ -125,31 +156,32 @@ namespace UnitySkills
             EditorGUILayout.Space(10);
 
             // Test Skill Section
-            EditorGUILayout.LabelField("Test Skill", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(L("test_skill"), EditorStyles.boldLabel);
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             
-            _testSkillName = EditorGUILayout.TextField("Skill Name", _testSkillName);
-            EditorGUILayout.LabelField("Parameters (JSON):");
+            _testSkillName = EditorGUILayout.TextField(L("skill_name"), _testSkillName);
+            EditorGUILayout.LabelField(L("parameters_json") + ":");
             _testSkillParams = EditorGUILayout.TextArea(_testSkillParams, GUILayout.Height(60));
             
-            if (GUILayout.Button("Execute Skill"))
+            if (GUILayout.Button(L("execute_skill")))
             {
                 _testResult = SkillRouter.Execute(_testSkillName, _testSkillParams);
             }
 
             if (!string.IsNullOrEmpty(_testResult))
             {
-                EditorGUILayout.LabelField("Result:");
+                EditorGUILayout.LabelField(L("result") + ":");
                 EditorGUILayout.TextArea(_testResult, GUILayout.Height(80));
             }
             EditorGUILayout.EndVertical();
+        }
 
-            EditorGUILayout.Space(10);
-
+        private void DrawSkillsTab()
+        {
             // Skills List
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Available Skills", EditorStyles.boldLabel);
-            if (GUILayout.Button("Refresh", GUILayout.Width(60)))
+            EditorGUILayout.LabelField(L("available_skills"), EditorStyles.boldLabel);
+            if (GUILayout.Button(L("refresh"), GUILayout.Width(60)))
             {
                 RefreshSkillsList();
                 SkillRouter.Refresh();
@@ -161,7 +193,7 @@ namespace UnitySkills
             if (_skillsByCategory != null)
             {
                 int totalSkills = _skillsByCategory.Values.Sum(l => l.Count);
-                EditorGUILayout.LabelField($"Total: {totalSkills} skills in {_skillsByCategory.Count} categories", EditorStyles.miniLabel);
+                EditorGUILayout.LabelField(string.Format(L("total_skills"), totalSkills, _skillsByCategory.Count), EditorStyles.miniLabel);
 
                 foreach (var kvp in _skillsByCategory.OrderBy(k => k.Key))
                 {
@@ -174,13 +206,18 @@ namespace UnitySkills
                         {
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField(skill.Name, EditorStyles.boldLabel);
-                            if (GUILayout.Button("Use", GUILayout.Width(40)))
+                            if (GUILayout.Button(L("use"), GUILayout.Width(40)))
                             {
                                 _testSkillName = skill.Name;
                                 _testSkillParams = BuildDefaultParams(skill.Method);
+                                _selectedTab = 0; // Switch to server tab
                             }
                             EditorGUILayout.EndHorizontal();
-                            EditorGUILayout.LabelField(skill.Description, EditorStyles.miniLabel);
+                            
+                            // Use localized description if available
+                            var desc = Localization.Get(skill.Name);
+                            if (desc == skill.Name) desc = skill.Description; // Fallback to original
+                            EditorGUILayout.LabelField(desc, EditorStyles.miniLabel);
                             EditorGUILayout.Space(3);
                         }
                         EditorGUI.indentLevel--;
@@ -190,6 +227,112 @@ namespace UnitySkills
 
             EditorGUILayout.EndScrollView();
         }
+
+        private void DrawAIConfigTab()
+        {
+            EditorGUILayout.LabelField(L("skill_config"), EditorStyles.boldLabel);
+            EditorGUILayout.Space(10);
+
+            // Claude Code
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Claude Code", EditorStyles.boldLabel);
+            
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(L("install_project") + ":", GUILayout.Width(100));
+            if (SkillInstaller.IsClaudeProjectInstalled)
+            {
+                EditorGUILayout.LabelField(L("installed"), EditorStyles.miniLabel);
+            }
+            else
+            {
+                if (GUILayout.Button(L("install_project"), GUILayout.Width(120)))
+                {
+                    var result = SkillInstaller.InstallClaude(false);
+                    if (result.success)
+                        EditorUtility.DisplayDialog("Success", L("install_success") + "\n" + result.message, "OK");
+                    else
+                        EditorUtility.DisplayDialog("Error", string.Format(L("install_failed"), result.message), "OK");
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(L("install_global") + ":", GUILayout.Width(100));
+            if (SkillInstaller.IsClaudeGlobalInstalled)
+            {
+                EditorGUILayout.LabelField(L("installed"), EditorStyles.miniLabel);
+            }
+            else
+            {
+                if (GUILayout.Button(L("install_global"), GUILayout.Width(120)))
+                {
+                    var result = SkillInstaller.InstallClaude(true);
+                    if (result.success)
+                        EditorUtility.DisplayDialog("Success", L("install_success") + "\n" + result.message, "OK");
+                    else
+                        EditorUtility.DisplayDialog("Error", string.Format(L("install_failed"), result.message), "OK");
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(10);
+
+            // Antigravity
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Antigravity", EditorStyles.boldLabel);
+            
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(L("install_project") + ":", GUILayout.Width(100));
+            if (SkillInstaller.IsAntigravityProjectInstalled)
+            {
+                EditorGUILayout.LabelField(L("installed"), EditorStyles.miniLabel);
+            }
+            else
+            {
+                if (GUILayout.Button(L("install_project"), GUILayout.Width(120)))
+                {
+                    var result = SkillInstaller.InstallAntigravity(false);
+                    if (result.success)
+                        EditorUtility.DisplayDialog("Success", L("install_success") + "\n" + result.message, "OK");
+                    else
+                        EditorUtility.DisplayDialog("Error", string.Format(L("install_failed"), result.message), "OK");
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(L("install_global") + ":", GUILayout.Width(100));
+            if (SkillInstaller.IsAntigravityGlobalInstalled)
+            {
+                EditorGUILayout.LabelField(L("installed"), EditorStyles.miniLabel);
+            }
+            else
+            {
+                if (GUILayout.Button(L("install_global"), GUILayout.Width(120)))
+                {
+                    var result = SkillInstaller.InstallAntigravity(true);
+                    if (result.success)
+                        EditorUtility.DisplayDialog("Success", L("install_success") + "\n" + result.message, "OK");
+                    else
+                        EditorUtility.DisplayDialog("Error", string.Format(L("install_failed"), result.message), "OK");
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(20);
+            
+            // Help text
+            EditorGUILayout.HelpBox(
+                Localization.Current == Localization.Language.Chinese
+                    ? "项目安装：将 Skill 安装到当前 Unity 项目目录\n全局安装：将 Skill 安装到用户目录，所有项目可用"
+                    : "Project Install: Install skill to current Unity project\nGlobal Install: Install skill to user folder, available for all projects",
+                MessageType.Info
+            );
+        }
+
+        private string L(string key) => Localization.Get(key);
 
         private string BuildDefaultParams(MethodInfo method)
         {
@@ -218,7 +361,6 @@ namespace UnitySkills
 
         private void OnInspectorUpdate()
         {
-            // Check server status periodically
             if (_serverRunning != SkillsHttpServer.IsRunning)
             {
                 _serverRunning = SkillsHttpServer.IsRunning;
