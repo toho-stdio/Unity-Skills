@@ -359,8 +359,6 @@ namespace UnitySkills
         
         #region Property Setters
 
-        #region Property Setters
-
         [UnitySkill("material_set_texture", "Set a texture on a material (auto-detects property name for render pipeline)")]
         public static object MaterialSetTexture(string name = null, int instanceId = 0, string path = null, string texturePath = null, string propertyName = null)
         {
