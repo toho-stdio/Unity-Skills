@@ -143,6 +143,100 @@ namespace UnitySkills
             };
         }
 
+        [UnitySkill("gameobject_rename", "Rename a GameObject (supports name/instanceId/path). Returns: {success, oldName, newName, instanceId}")]
+        public static object GameObjectRename(string name = null, int instanceId = 0, string path = null, string newName = null)
+        {
+            if (string.IsNullOrEmpty(newName))
+                return new { error = "newName parameter is required" };
+
+            var (go, error) = GameObjectFinder.FindOrError(name, instanceId, path);
+            if (error != null) return error;
+
+            var oldName = go.name;
+            Undo.RecordObject(go, "Rename GameObject");
+            go.name = newName;
+
+            return new { 
+                success = true, 
+                oldName, 
+                newName = go.name, 
+                instanceId = go.GetInstanceID(),
+                path = GameObjectFinder.GetPath(go)
+            };
+        }
+
+        [UnitySkill("gameobject_rename_batch", "Rename multiple GameObjects in one call (Efficient). items: JSON array of {name, instanceId, path, newName}. Returns array with oldName, newName for each.")]
+        public static object GameObjectRenameBatch(string items)
+        {
+            if (string.IsNullOrEmpty(items))
+                return new { error = "items parameter is required. Example: [{\"instanceId\":12345,\"newName\":\"Cube_01\"}]" };
+
+            try
+            {
+                var itemList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<BatchRenameItem>>(items);
+                if (itemList == null || itemList.Count == 0)
+                    return new { error = "items parameter is empty or invalid JSON" };
+
+                var results = new List<object>();
+                int successCount = 0;
+                int failCount = 0;
+
+                foreach (var item in itemList)
+                {
+                    try
+                    {
+                        if (string.IsNullOrEmpty(item.newName))
+                        {
+                            results.Add(new { target = item.name ?? item.path ?? item.instanceId.ToString(), success = false, error = "newName is required" });
+                            failCount++;
+                            continue;
+                        }
+
+                        var (go, error) = GameObjectFinder.FindOrError(item.name, item.instanceId, item.path);
+                        if (error != null)
+                        {
+                            results.Add(new { target = item.name ?? item.path ?? item.instanceId.ToString(), success = false, error = "Object not found" });
+                            failCount++;
+                            continue;
+                        }
+
+                        var oldName = go.name;
+                        Undo.RecordObject(go, "Batch Rename " + go.name);
+                        go.name = item.newName;
+
+                        results.Add(new { success = true, oldName, newName = go.name, instanceId = go.GetInstanceID() });
+                        successCount++;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        results.Add(new { target = item.name ?? item.path, success = false, error = ex.Message });
+                        failCount++;
+                    }
+                }
+
+                return new
+                {
+                    success = failCount == 0,
+                    totalItems = itemList.Count,
+                    successCount,
+                    failCount,
+                    results
+                };
+            }
+            catch (System.Exception ex)
+            {
+                return new { error = $"Failed to parse items JSON: {ex.Message}" };
+            }
+        }
+
+        private class BatchRenameItem
+        {
+            public string name { get; set; }
+            public int instanceId { get; set; }
+            public string path { get; set; }
+            public string newName { get; set; }
+        }
+
         [UnitySkill("gameobject_delete", "Delete a GameObject (supports name/instanceId/path)")]
         public static object GameObjectDelete(string name = null, int instanceId = 0, string path = null)
         {

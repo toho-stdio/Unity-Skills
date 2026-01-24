@@ -35,7 +35,7 @@ All notable changes to **UnitySkills** will be documented in this file.
 | **Texture** | 3 | `TextureSkills.cs` (NEW) |
 | **Audio** | 3 | `AudioSkills.cs` (NEW) |
 | **Model** | 3 | `ModelSkills.cs` (NEW) |
-| **GameObject** | +1 | `gameobject_duplicate_batch` |
+| **GameObject** | +3 | `gameobject_duplicate_batch`, `gameobject_rename`, `gameobject_rename_batch` |
 | **Light** | +2 | `light_set_enabled_batch`, `light_set_properties_batch` |
 
 ### 📝 Documentation Improvements / 文档优化

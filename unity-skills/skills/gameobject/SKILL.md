@@ -31,9 +31,11 @@ Manipulate GameObjects in Unity scene - the fundamental building blocks of any U
 | `gameobject_set_active` | Enable/disable GameObject |
 | `gameobject_get_info` | Get detailed information |
 | `gameobject_duplicate` | Duplicate a single GameObject (returns copyName, copyInstanceId) |
+| `gameobject_rename` | **Rename a GameObject (returns oldName, newName)** |
 | `gameobject_create_batch` | Create multiple GameObjects (Efficient) |
 | `gameobject_delete_batch` | Delete multiple GameObjects (Efficient) |
-| `gameobject_duplicate_batch` | **Duplicate multiple GameObjects (Efficient, NEW)** |
+| `gameobject_duplicate_batch` | Duplicate multiple GameObjects (Efficient) |
+| `gameobject_rename_batch` | **Rename multiple GameObjects (Efficient, NEW)** |
 | `gameobject_set_active_batch` | Set active state for multiple objects |
 | `gameobject_set_transform_batch` | Set transform for multiple objects |
 | `gameobject_set_layer_batch` | Set layer for multiple objects |
@@ -78,6 +80,22 @@ Manipulate GameObjects in Unity scene - the fundamental building blocks of any U
 **Batch**: `items` = JSON array of `{name, instanceId, path}`
 ```json
 [{"instanceId": 12345}, {"instanceId": 12346}, {"name": "Cube"}]
+```
+
+### gameobject_rename / gameobject_rename_batch
+
+**Single**: Returns `{success, oldName, newName, instanceId, path}`
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | No* | Current object name |
+| `instanceId` | int | No* | Instance ID (preferred for batch operations) |
+| `path` | string | No* | Hierarchy path |
+| `newName` | string | Yes | New name for the object |
+
+**Batch**: `items` = JSON array of `{name, instanceId, path, newName}`
+```json
+[{"instanceId": 12345, "newName": "Cube_01"}, {"instanceId": 12346, "newName": "Cube_02"}]
 ```
 
 ### gameobject_find
