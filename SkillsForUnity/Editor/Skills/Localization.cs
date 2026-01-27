@@ -376,6 +376,31 @@ namespace UnitySkills
             // Optimization Skills
             {"optimize_textures", "优化纹理设置 (压缩/最大尺寸)"},
             {"optimize_mesh_compression", "设置模型网格压缩级别"},
+            
+            // Debug Skills
+            {"debug_get_errors", "获取控制台错误日志 (过滤)"},
+            {"debug_check_compilation", "检查编译状态"},
+            {"debug_force_recompile", "强制重编译脚本"},
+            {"debug_get_system_info", "获取编辑器/系统信息"},
+            
+            // Camera Skills
+            {"camera_align_view_to_object", "对齐 Scene 视图到物体"},
+            {"camera_get_info", "获取 Scene 相机信息"},
+            {"camera_set_transform", "设置 Scene 相机位置/旋转"},
+            {"camera_look_at", "Scene 相机看向指定点"},
+            
+            // Timeline Skills
+            {"timeline_create", "创建 Timeline 资产及实例"},
+            {"timeline_add_audio_track", "添加音轨"},
+            {"timeline_add_animation_track", "添加动画轨道(可选绑定对象)"},
+            
+            // Phase 4: Cinemachine & Logging
+            {"cinemachine_create_vcam", "创建虚拟相机"},
+            {"cinemachine_inspect_vcam", "内省虚拟相机 (获取组件与Tooltip)"},
+            {"cinemachine_set_vcam_property", "通用设置虚拟相机属性 (支持反射)"},
+            {"cinemachine_set_targets", "设置虚拟相机跟随/瞄准目标"},
+            
+            {"debug_get_logs", "获取控制台日志 (按类型筛选)"},
         };
     }
 }

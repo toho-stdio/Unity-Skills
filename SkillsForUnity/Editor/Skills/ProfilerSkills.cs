@@ -18,10 +18,33 @@ namespace UnitySkills
             long totalReservedMemory = Profiler.GetTotalReservedMemoryLong();
             long totalUnusedReservedMemory = Profiler.GetTotalUnusedReservedMemoryLong();
             
+            // Calculate FPS from frameTime (frameTime is in ms, so we divide 1000 by it)
+            float frameTime = UnityStats.frameTime;
+            float fps = frameTime > 0 ? 1000f / frameTime : 0f;
+            
+            // Count visible skinned meshes manually
+            int visibleSkinnedMeshes = 0;
+            var skinnedMeshRenderers = Object.FindObjectsOfType<SkinnedMeshRenderer>();
+            foreach (var smr in skinnedMeshRenderers)
+            {
+                if (smr.isVisible)
+                    visibleSkinnedMeshes++;
+            }
+            
+            // Count visible animators
+            int visibleAnimators = 0;
+            var animators = Object.FindObjectsOfType<Animator>();
+            foreach (var anim in animators)
+            {
+                var renderer = anim.GetComponent<Renderer>();
+                if (renderer != null && renderer.isVisible)
+                    visibleAnimators++;
+            }
+            
             return new
             {
-                // UnityStats only provides these properties
-                frameTime = UnityStats.frameTime,
+                fps,
+                frameTime,
                 renderTime = UnityStats.renderTime,
                 triangles = UnityStats.triangles,
                 vertices = UnityStats.vertices,
@@ -31,6 +54,8 @@ namespace UnitySkills
                 dynamicBatchedDrawCalls = UnityStats.dynamicBatchedDrawCalls,
                 staticBatchedDrawCalls = UnityStats.staticBatchedDrawCalls,
                 instancedBatchedDrawCalls = UnityStats.instancedBatchedDrawCalls,
+                visibleSkinnedMeshes,
+                visibleAnimators,
                 memory = new
                 {
                     totalAllocatedMB = totalAllocatedMemory / (1024f * 1024f),
@@ -41,16 +66,6 @@ namespace UnitySkills
                 }
             };
         }
-        
-        // Helper to access internal TextureUtil via reflection if public API is missing in older versions,
-        // but TextureUtil is generally public in Editor namespace in recent versions? 
-        // Actually UnityEditor.TextureUtil is internal.
-        // We might need to handle that if compilation fails. 
-        // Let's assume for now we use Profiler.supported which returns bool.
-        // Wait, TextureUtil is internal. I should use ProfilerRecorder or safe public APIs.
-        // But "UnityStats" is fine.
-        // Texture memory: System.GC.GetTotalMemory(false) is C# heap.
-        // Let's rely on standard Profiler calls.
     }
 }
 
