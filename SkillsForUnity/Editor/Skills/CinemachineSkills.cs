@@ -1,12 +1,14 @@
 using UnityEngine;
 using UnityEditor;
 using Unity.Cinemachine;
-using UnityEngine.Splines;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+#if UNITY_SPLINES
+using UnityEngine.Splines;
+#endif
 
 namespace UnitySkills
 {
@@ -538,6 +540,7 @@ namespace UnitySkills
              return new { success = true, message = $"Removed {targetName} from {groupName}" };
         }
 
+#if UNITY_SPLINES
         [UnitySkill("cinemachine_set_spline", "Set Spline for VCam Body. Inputs: vcamName, splineName.")]
         public static object CinemachineSetSpline(string vcamName, string splineName)
         {
@@ -563,6 +566,7 @@ namespace UnitySkills
 
             return new { success = true, message = $"Assigned Spline {splineName} to VCam {vcamName}" };
         }
+#endif
         [UnitySkill("cinemachine_add_extension", "Add a CinemachineExtension. Inputs: vcamName, extensionName (e.g. CinemachineStoryboard).")]
         public static object CinemachineAddExtension(string vcamName, string extensionName)
         {
