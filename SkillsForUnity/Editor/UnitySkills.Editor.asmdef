@@ -4,6 +4,7 @@
     "references": [
         "Newtonsoft.Json",
         "Unity.Timeline",
+        "Cinemachine",
         "Unity.Cinemachine",
         "Unity.Splines"
     ],
