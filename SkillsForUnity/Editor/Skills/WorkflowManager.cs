@@ -46,9 +46,14 @@ namespace UnitySkills
                 {
                     string json = File.ReadAllText(HistoryFilePath);
                     _history = JsonUtility.FromJson<WorkflowHistoryData>(json);
-                    
+
+                    // 确保列表不为 null（JsonUtility 可能不会初始化新字段）
+                    if (_history.tasks == null) _history.tasks = new List<WorkflowTask>();
+                    if (_history.undoneStack == null) _history.undoneStack = new List<WorkflowTask>();
+
                     // Cleanup any null tasks if they somehow got in
                     _history.tasks.RemoveAll(t => t == null);
+                    _history.undoneStack.RemoveAll(t => t == null);
                 }
                 catch (Exception e)
                 {

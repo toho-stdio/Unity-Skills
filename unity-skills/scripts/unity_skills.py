@@ -74,13 +74,20 @@ class UnitySkills:
     def call(self, skill_name: str, verbose: bool = False, **kwargs) -> Dict[str, Any]:
         """
         Call a skill on this instance.
-        
+
         Returns a normalized response with 'success' field and flattened result data.
         """
         try:
             # Combine verbose into kwargs for JSON body
             kwargs['verbose'] = verbose
-            response = requests.post(f"{self.url}/skill/{skill_name}", json=kwargs, timeout=30)
+            # 使用 ensure_ascii=False 保留原始中文字符，避免转义为 \uXXXX
+            json_data = json.dumps(kwargs, ensure_ascii=False)
+            response = requests.post(
+                f"{self.url}/skill/{skill_name}",
+                data=json_data.encode('utf-8'),
+                headers={'Content-Type': 'application/json; charset=utf-8'},
+                timeout=30
+            )
             response.encoding = 'utf-8'  # 确保正确解码UTF-8
 
             try:

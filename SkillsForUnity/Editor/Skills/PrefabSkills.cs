@@ -20,7 +20,8 @@ namespace UnitySkills
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            var prefab = PrefabUtility.SaveAsPrefabAsset(go, savePath);
+            // 使用 SaveAsPrefabAssetAndConnect 将场景物体连接为预制体实例
+            var prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(go, savePath, InteractionMode.UserAction);
             return new { success = true, prefabPath = savePath, name = prefab.name };
         }
 
