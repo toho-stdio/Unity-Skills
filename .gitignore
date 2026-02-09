@@ -54,7 +54,7 @@ TestProjects/UnityMCPTests/Assets/Temp/
 reports/
 
 # Local Claude configs (not for repo)
-.claude/local/
+.claude/
 
 # Local testing harness
 scripts/local-test/
