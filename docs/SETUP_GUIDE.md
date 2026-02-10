@@ -17,10 +17,28 @@ REST API 直接控制 Unity Editor，让 AI 生成极简脚本完成场景操作
 ## 一、安装 Unity 插件
 
 ### 方式 A：Git URL（推荐）
+
+通过 Unity Package Manager 直接添加 Git URL：
 ```
 Unity 菜单 → Window → Package Manager → + → Add package from git URL
+```
+
+**稳定版安装 (main)**:
+```
 https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity
 ```
+
+**开发测试版安装 (beta)**:
+```
+https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity#beta
+```
+
+**指定版本安装** (如 v1.4.0):
+```
+https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity#v1.4.0
+```
+
+> 📦 所有版本包可在 [Releases](https://github.com/Besty0728/Unity-Skills/releases) 页面下载
 
 ### 方式 B：本地安装
 将 `SkillsForUnity` 文件夹复制到 Unity 项目的 `Packages/` 目录
@@ -133,7 +151,7 @@ curl -X POST http://localhost:8090/skill/scene_save \
 
 ---
 
-## 五、Python 客户端
+## 六、Python 客户端
 
 ```python
 import requests
@@ -151,7 +169,7 @@ call_skill("editor_play")
 
 ---
 
-## 六、完整 Skills 列表
+## 七、完整 Skills 列表
 
 > ⚠️ **提示**：大部分模块支持 `*_batch` 批量操作，操作多个物体时应优先使用批量 Skills。
 
@@ -270,29 +288,35 @@ call_skill("editor_play")
 
 ---
 
-## 七、添加自定义 Skill
+## 八、添加自定义 Skill
+
+在 `SkillsForUnity/Editor/Skills/` 目录下创建 C# 文件，使用 `[UnitySkill]` 属性标记静态方法：
 
 ```csharp
+using UnityEngine;
 using UnitySkills;
 
-public static class MySkills
+namespace UnitySkills
 {
-    [UnitySkill("my_custom_skill", "描述")]
-    public static object MyCustomSkill(string param1, float param2 = 0)
+    public static class MyCustomSkills
     {
-        // 你的逻辑
-        return new { success = true, result = "..." };
+        [UnitySkill("my_custom_skill", "我的自定义技能描述")]
+        public static object MyCustomSkill(string param1, float param2 = 0)
+        {
+            // 你的逻辑
+            return new { success = true, result = "..." };
+        }
     }
 }
 ```
 
-重启 REST 服务器后自动发现新 Skill。
+Unity 重新编译后自动发现新 Skill（无需重启服务器）。
 
 ---
 
-## 八、AI 集成
+## 九、AI 集成
 
-将 `claude_skill_unity/claude_skill_unity/SKILL.md` 添加为 Claude Skill，AI 即可通过生成 Python 脚本控制 Unity。
+将 `unity-skills/SKILL.md` 添加为 AI Skill，即可通过生成 Python 脚本控制 Unity。
 
 ### AI 对话示例
 ```
