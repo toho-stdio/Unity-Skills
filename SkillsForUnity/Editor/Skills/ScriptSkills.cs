@@ -146,7 +146,7 @@ public class {CLASS} : MonoBehaviour
                 for (int i = 0; i < lines.Length; i++)
                 {
                     bool match = isRegex
-                        ? Regex.IsMatch(lines[i], pattern, RegexOptions.None, TimeSpan.FromSeconds(1))
+                        ? Regex.IsMatch(lines[i], pattern, RegexOptions.None, System.TimeSpan.FromSeconds(1))
                         : lines[i].Contains(pattern);
 
                     if (match)

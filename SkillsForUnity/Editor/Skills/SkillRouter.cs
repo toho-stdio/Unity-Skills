@@ -134,6 +134,7 @@ namespace UnitySkills
                 }, _jsonSettings);
             }
 
+            bool autoStartedWorkflow = false;
             try
             {
                 var args = string.IsNullOrEmpty(json) ? new JObject() : JObject.Parse(json);
@@ -172,7 +173,6 @@ namespace UnitySkills
                 int undoGroup = UnityEditor.Undo.GetCurrentGroup();
 
                 // ========== AUTO WORKFLOW RECORDING ==========
-                bool autoStartedWorkflow = false;
                 if (_workflowTrackedSkills.Contains(name) && !WorkflowManager.IsRecording)
                 {
                     var desc = $"{name} - {(json?.Length > 80 ? json.Substring(0, 80) + "..." : json ?? "")}";
