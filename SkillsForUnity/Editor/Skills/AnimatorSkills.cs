@@ -14,6 +14,9 @@ namespace UnitySkills
         [UnitySkill("animator_create_controller", "Create a new Animator Controller")]
         public static object AnimatorCreateController(string name, string folder = "Assets/Animations")
         {
+            var folderErr = Validate.SafePath(folder, "folder");
+            if (folderErr != null) return folderErr;
+
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
@@ -31,6 +34,9 @@ namespace UnitySkills
         [UnitySkill("animator_add_parameter", "Add a parameter to an Animator Controller")]
         public static object AnimatorAddParameter(string controllerPath, string paramName, string paramType = "float", float defaultFloat = 0, int defaultInt = 0, bool defaultBool = false)
         {
+            var pathErr = Validate.SafePath(controllerPath, "controllerPath");
+            if (pathErr != null) return pathErr;
+
             var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(controllerPath);
             if (controller == null)
                 return new { error = $"Controller not found: {controllerPath}" };
@@ -85,6 +91,9 @@ namespace UnitySkills
         [UnitySkill("animator_get_parameters", "Get all parameters from an Animator Controller")]
         public static object AnimatorGetParameters(string controllerPath)
         {
+            var pathErr = Validate.SafePath(controllerPath, "controllerPath");
+            if (pathErr != null) return pathErr;
+
             var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(controllerPath);
             if (controller == null)
                 return new { error = $"Controller not found: {controllerPath}" };
@@ -188,6 +197,8 @@ namespace UnitySkills
         public static object AnimatorAssignController(string name = null, int instanceId = 0, string path = null, string controllerPath = null)
         {
             if (Validate.Required(controllerPath, "controllerPath") is object err2) return err2;
+            var pathErr = Validate.SafePath(controllerPath, "controllerPath");
+            if (pathErr != null) return pathErr;
 
             var (go, error) = GameObjectFinder.FindOrError(name, instanceId, path);
             if (error != null) return error;
@@ -212,6 +223,9 @@ namespace UnitySkills
         [UnitySkill("animator_list_states", "List all states in an Animator Controller layer")]
         public static object AnimatorListStates(string controllerPath, int layer = 0)
         {
+            var pathErr = Validate.SafePath(controllerPath, "controllerPath");
+            if (pathErr != null) return pathErr;
+
             var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(controllerPath);
             if (controller == null)
                 return new { error = $"Controller not found: {controllerPath}" };

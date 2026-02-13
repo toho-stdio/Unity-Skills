@@ -2,23 +2,25 @@
 
 All notable changes to **UnitySkills** will be documented in this file.
 
-## [1.5.0] - 2026-02-12
+## [1.5.0] - 2026-02-13
 
 ### Added
 - **BatchExecutor 泛型框架**: 新增 `BatchExecutor.Execute<T>()` 通用批处理框架，支持 JSON 反序列化、逐项执行、错误隔离、setup/teardown 钩子（`BatchExecutor.cs`）
 - **SkillsLogger 统一日志**: 新增 `SkillsLogger` 类，支持 Off/Error/Warning/Info/Agent/Verbose 日志级别，替代散落的 `Debug.Log` 调用（`SkillsLogger.cs`）
 - **参数校验扩展**: `Validate` 类新增 `InRange()`、`RequiredJsonArray()`、`SafePath()` 方法，形成完整的参数校验工具链（`GameObjectFinder.cs`）
-- **单元测试框架**: 新增 `Tests/Editor/` 目录，包含 3 个测试套件共 72 个测试用例：
-  - `BatchExecutorTests.cs` — 21 个测试覆盖批处理成功/失败/setup/teardown 生命周期
-  - `RegistryServiceTests.cs` — 17 个测试覆盖哈希确定性和边界条件
+- **单元测试框架**: 新增 `Tests/Editor/` 目录，包含 3 个测试套件共 67 个测试用例：
+  - `BatchExecutorTests.cs` — 17 个测试覆盖批处理成功/失败/setup/teardown 生命周期
+  - `RegistryServiceTests.cs` — 16 个测试覆盖哈希确定性和边界条件
   - `ValidateTests.cs` — 34 个测试覆盖 Required/InRange/SafePath 校验
+- **场景空间查询 Skill**: 新增 `scene_spatial_query`，支持按坐标/对象名查找半径内的对象，可按组件类型过滤（`PerceptionSkills.cs`）
+- **场景材质概览 Skill**: 新增 `scene_materials`，按 Shader 分组展示场景中所有材质的使用情况，可选输出 Shader 属性列表（`PerceptionSkills.cs`）
 
 ### Security
 - **SHA256 哈希**: RegistryService 实例 ID 从 MD5 迁移到 SHA256（`RegistryService.cs`）
 - **TOCTOU 文件锁**: 注册表文件读写添加文件锁防止竞态条件（`RegistryService.cs`）
 - **POST Body 大小限制**: HTTP 服务器拒绝超过 10MB 的请求体，返回 413 状态码（`SkillsHttpServer.cs`）
-- **ManualResetEventSlim 泄漏修复**: try/finally 模式确保信号量在 ThreadPool 入队失败时仍被释放（`SkillsHttpServer.cs`）
-- **路径遍历防护**: 15 个文件操作方法补齐 `Validate.SafePath()` 校验，涵盖 Script/Shader/Material/ScriptableObject/Prefab/Scene/Asset/Cleaner/Validation 共 10 个 Skill 文件
+- **ManualResetEventSlim 泄漏修复**: try/finally 模式确保信号量在 ThreadPool 入队失败时仍被释放，包括超大请求拒绝路径（`SkillsHttpServer.cs`）
+- **路径遍历防护**: 19 个文件操作方法补齐 `Validate.SafePath()` 校验，涵盖 Script/Shader/Material/ScriptableObject/Prefab/Scene/Asset/Cleaner/Validation/Animator 共 11 个 Skill 文件
 
 ### Changed
 
@@ -29,24 +31,26 @@ All notable changes to **UnitySkills** will be documented in this file.
 - **SkillRouter 消除双重序列化**: 替换 `JObject.FromObject(result)` 为反射检测错误字段，避免不必要的 JSON 中间转换（`SkillRouter.cs`）
 
 #### 代码质量
-- **GameObjectFinder 迁移**: 29+ 处原始 `GameObject.Find` 调用迁移到 `GameObjectFinder.FindOrError`，提供错误提示含相似名称建议，涉及 PrefabSkills/EventSkills/TimelineSkills/CameraSkills/EditorSkills/UISkills/WorkflowSkills/ComponentSkills/SampleSkills 共 9 个文件
+- **GameObjectFinder 全面迁移**: 50+ 处原始 `GameObject.Find` 调用迁移到 `GameObjectFinder.FindOrError`，提供错误提示含相似名称建议，涉及 PrefabSkills/EventSkills/TimelineSkills/CameraSkills/EditorSkills/UISkills/WorkflowSkills/ComponentSkills/SampleSkills/CinemachineSkills 共 10 个文件
+- **CinemachineSkills 全面升级**: 所有 Skill 方法支持 name/instanceId/path 三种查找方式，与其他 Skills 保持一致（`CinemachineSkills.cs`）
 - **统一返回值格式**: 10 个方法补齐 `success = true/false` 字段（`SampleSkills.cs`、`OptimizationSkills.cs`、`ValidationSkills.cs`）
 - **区域无关数值解析**: ComponentSkills 和 ScriptableObjectSkills 中 7 处 `float.Parse`/`double.Parse` 添加 `CultureInfo.InvariantCulture`，修复非英文区域的小数点解析问题
-- **CinemachineSkills 审查修复**: 15 处代码问题修复，包括空引用保护、异常处理、API 兼容性（`CinemachineSkills.cs`）
 - **静默异常修复**: 多处空 catch 块添加日志记录，便于调试定位问题
 - **文件重命名**: `NextGenSkills.cs` → `PerceptionSkills.cs`，文件名与类名保持一致
 - **SampleSkills 标注**: 明确标记为便捷别名，4 处 `GameObject.Find` 迁移到 `GameObjectFinder.FindOrError`
+- **PerceptionSkills 全面改进**: `script_analyze` 扩展支持 ScriptableObject 和用户自定义类，返回新增 `kind` 字段；`hierarchy_describe` 组件 emoji 提示从 5 种扩展到 13 种（新增 Animator/AudioSource/ParticleSystem/Collider/Rigidbody/SkinnedMeshRenderer/SpriteRenderer/UI）；`IsUnityCallback` HashSet 提升为 `static readonly` 并扩充回调列表（`PerceptionSkills.cs`）
 
 #### 基础设施
 - **PhysicsSetGravity Undo 支持**: 通过 `DynamicsManager.asset` 注册 Undo，重力修改可撤销（`PhysicsSkills.cs`）
 - **双重检查锁**: 单例和懒初始化改用双重检查锁模式（`SkillsHttpServer.cs`）
 - **超时常量化**: 散落的超时魔数提取为命名常量（`SkillsHttpServer.cs`）
 - **版本集中化**: 版本号集中管理，避免多处硬编码不一致
-- **Python 客户端 retry 重写**: `unity_skills.py` 重写重试逻辑，支持 Domain Reload 场景的自动恢复
+- **Python 客户端异常安全**: `unity_skills.py` workflow 相关代码使用 try/finally 确保 `_current_workflow_active` 状态正确重置
 
 ### Performance
 - **GameObjectFinder 帧级缓存**: 同一帧内重复查找同名 GameObject 直接命中缓存，避免冗余遍历（`GameObjectFinder.cs`）
 - **反射成员缓存**: ComponentSkills 新增 `_memberCache` 字典和 `FindMember()` 辅助方法，属性/字段查找结果被缓存，批量操作性能显著提升（`ComponentSkills.cs`）
+- **scene_summarize 单次遍历**: 消除 3 次额外 `FindObjectsOfType`（Light/Camera/Canvas），改为在组件遍历中内联统计，大场景性能提升显著（`PerceptionSkills.cs`）
 
 ### Docs
 - README.md 技能数量修正

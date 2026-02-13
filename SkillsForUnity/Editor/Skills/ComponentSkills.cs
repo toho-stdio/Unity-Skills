@@ -18,6 +18,7 @@ namespace UnitySkills
         private static readonly Dictionary<string, System.Type> _typeCache = new Dictionary<string, System.Type>();
 
         // Cache for property/field lookups to avoid repeated reflection
+        // NOTE: Not thread-safe - only access from Unity main thread (guaranteed by SkillsHttpServer Producer-Consumer pattern)
         private static readonly Dictionary<string, (PropertyInfo prop, FieldInfo field)> _memberCache =
             new Dictionary<string, (PropertyInfo, FieldInfo)>();
         

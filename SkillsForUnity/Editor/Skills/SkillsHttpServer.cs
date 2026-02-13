@@ -478,25 +478,35 @@ namespace UnitySkills
                         if (request.ContentLength64 > MaxBodySizeBytes)
                         {
                             // Reject oversized request immediately
-                            var rejectJob = new RequestJob
+                            ManualResetEventSlim rejectSignal = null;
+                            try
                             {
-                                Context = context,
-                                HttpMethod = request.HttpMethod,
-                                Path = request.Url.AbsolutePath,
-                                Body = "",
-                                EnqueueTimeTicks = DateTime.UtcNow.Ticks,
-                                RequestId = $"req_{Interlocked.Increment(ref _requestIdCounter):X8}",
-                                AgentId = DetectAgent(request),
-                                StatusCode = 413,
-                                ResponseJson = JsonConvert.SerializeObject(new {
-                                    error = "Request body too large",
-                                    maxSizeBytes = MaxBodySizeBytes,
-                                    receivedBytes = request.ContentLength64
-                                }, _jsonSettings),
-                                IsProcessed = true,
-                                CompletionSignal = new ManualResetEventSlim(true) // Already signaled
-                            };
-                            ThreadPool.QueueUserWorkItem(_ => WaitAndRespond(rejectJob));
+                                rejectSignal = new ManualResetEventSlim(true); // Already signaled
+                                var rejectJob = new RequestJob
+                                {
+                                    Context = context,
+                                    HttpMethod = request.HttpMethod,
+                                    Path = request.Url.AbsolutePath,
+                                    Body = "",
+                                    EnqueueTimeTicks = DateTime.UtcNow.Ticks,
+                                    RequestId = $"req_{Interlocked.Increment(ref _requestIdCounter):X8}",
+                                    AgentId = DetectAgent(request),
+                                    StatusCode = 413,
+                                    ResponseJson = JsonConvert.SerializeObject(new {
+                                        error = "Request body too large",
+                                        maxSizeBytes = MaxBodySizeBytes,
+                                        receivedBytes = request.ContentLength64
+                                    }, _jsonSettings),
+                                    IsProcessed = true,
+                                    CompletionSignal = rejectSignal
+                                };
+                                ThreadPool.QueueUserWorkItem(_ => WaitAndRespond(rejectJob));
+                                rejectSignal = null; // Ownership transferred
+                            }
+                            finally
+                            {
+                                rejectSignal?.Dispose();
+                            }
                             continue;
                         }
 

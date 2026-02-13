@@ -19,7 +19,7 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 
-__version__ = "1.4.4"
+__version__ = "1.5.0"
 
 UNITY_URL = "http://localhost:8090"
 DEFAULT_PORT = 8090
@@ -386,20 +386,21 @@ def call_skill(skill_name: str, **kwargs) -> Dict[str, Any]:
     if should_track:
         # Start workflow
         _current_workflow_active = True
-        _get_default_client().call(
-            'workflow_task_start',
-            tag=skill_name,
-            description=f"Auto: {skill_name} - {str(kwargs)[:100]}"
-        )
+        try:
+            _get_default_client().call(
+                'workflow_task_start',
+                tag=skill_name,
+                description=f"Auto: {skill_name} - {str(kwargs)[:100]}"
+            )
 
-        # Execute actual operation
-        result = _get_default_client().call(skill_name, **kwargs)
+            # Execute actual operation
+            result = _get_default_client().call(skill_name, **kwargs)
 
-        # End workflow
-        _get_default_client().call('workflow_task_end')
-        _current_workflow_active = False
-
-        return result
+            # End workflow
+            _get_default_client().call('workflow_task_end')
+            return result
+        finally:
+            _current_workflow_active = False
     else:
         return _get_default_client().call(skill_name, **kwargs)
 
@@ -425,8 +426,10 @@ class WorkflowContext:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         global _current_workflow_active
-        call_skill('workflow_task_end')
-        _current_workflow_active = False
+        try:
+            call_skill('workflow_task_end')
+        finally:
+            _current_workflow_active = False
         return False  # Do not suppress exceptions
 
 def workflow_context(tag: str, description: str = '') -> WorkflowContext:
