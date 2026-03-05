@@ -63,12 +63,12 @@ namespace UnitySkills
         }
 
         [UnitySkill("cinemachine_inspect_vcam", "Deeply inspect a VCam, returning fields and tooltips.")]
-        public static object CinemachineInspectVCam(string objectName = null, int instanceId = 0, string path = null)
+        public static object CinemachineInspectVCam(string vcamName = null, int instanceId = 0, string path = null)
         {
 #if !CINEMACHINE_2 && !CINEMACHINE_3
             return NoCinemachine();
 #else
-            var (go, err) = GameObjectFinder.FindOrError(objectName, instanceId, path);
+            var (go, err) = GameObjectFinder.FindOrError(name: vcamName, instanceId: instanceId, path: path);
             if (err != null) return err;
 
 #if CINEMACHINE_3
