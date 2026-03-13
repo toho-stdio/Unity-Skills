@@ -79,15 +79,11 @@ namespace UnitySkills
         private static double _lastHeartbeatTime = 0;
 
         // Watchdog: periodically verify listener thread is alive and restart if not
-        private const double WatchdogInterval = 5.0;
-        private const double RecoveryRetryInterval = 1.0;
+        private const double WatchdogInterval = 15.0;
         private static double _lastWatchdogCheck = 0;
-        private static double _lastRecoveryAttemptTime = -999;
 
         // KeepAlive: unconditional wakeup interval (ticks; 5s = 50_000_000 ticks)
         private static long _lastForceWakeTicks = 0;
-        private static int _restartRequested = 0;
-        private static string _restartReason = "";
 
         // Statistics
         private static long _totalRequestsProcessed = 0;
@@ -213,7 +209,7 @@ namespace UnitySkills
                 StatusCode = 200;
                 IsProcessed = false;
                 ResponseDispatched = false;
-                PoolReturned = 0;
+                // Note: PoolReturned is managed by ReturnRequestJob/Prepare, not Reset
                 CompletionSignal.Reset();
             }
         }
@@ -278,69 +274,6 @@ namespace UnitySkills
 
             _admittedThisSecond++;
             return _admittedThisSecond <= MaxRequestsPerSecond;
-        }
-
-        private static bool IsListenerHealthy()
-        {
-            try
-            {
-                return _listenerThread != null &&
-                       _listenerThread.IsAlive &&
-                       _listener != null &&
-                       _listener.IsListening;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private static void RequestServerRecovery(string reason)
-        {
-            if (_domainReloadPending)
-                return;
-
-            _restartReason = string.IsNullOrEmpty(reason) ? "Unknown reason" : reason;
-            Interlocked.Exchange(ref _restartRequested, 1);
-        }
-
-        private static void ClearRecoveryRequest()
-        {
-            _restartReason = "";
-            Interlocked.Exchange(ref _restartRequested, 0);
-        }
-
-        private static void AttemptServerRecovery(double now)
-        {
-            if (_domainReloadPending)
-                return;
-
-            if (now - _lastRecoveryAttemptTime < RecoveryRetryInterval)
-                return;
-
-            _lastRecoveryAttemptTime = now;
-            string reason = string.IsNullOrEmpty(_restartReason) ? "Unknown reason" : _restartReason;
-            int port = _port;
-
-            SkillsLogger.LogWarning($"Server recovery triggered: {reason}");
-
-            if (_isRunning)
-                Stop();
-
-            Start(port, fallbackToAuto: true);
-
-            if (_isRunning)
-            {
-                ClearRecoveryRequest();
-            }
-            else
-            {
-                ScheduleDelayedCall(RecoveryRetryInterval, () =>
-                {
-                    if (Interlocked.CompareExchange(ref _restartRequested, 0, 0) == 1)
-                        AttemptServerRecovery(EditorApplication.timeSinceStartup);
-                });
-            }
         }
 
         private static void SendImmediateJsonResponse(HttpListenerContext context, HttpListenerRequest request, int statusCode, object payload)
@@ -640,8 +573,6 @@ namespace UnitySkills
                 }
 
                 _isRunning = true;
-                ClearRecoveryRequest();
-                _lastRecoveryAttemptTime = EditorApplication.timeSinceStartup;
 
                 // Persist state for Domain Reload recovery
                 EditorPrefs.SetBool(PREF_SERVER_SHOULD_RUN, true);
@@ -683,7 +614,6 @@ namespace UnitySkills
             if (permanent)
             {
                 EditorPrefs.SetBool(PREF_SERVER_SHOULD_RUN, false);
-                ClearRecoveryRequest();
             }
 
             // Unregister from global registry
@@ -743,12 +673,7 @@ namespace UnitySkills
                         hasPendingJobs = _jobQueue.Count > 0;
                     }
 
-                    if (_isRunning && !_domainReloadPending && !IsListenerHealthy())
-                    {
-                        RequestServerRecovery("KeepAlive detected unhealthy listener state");
-                    }
-                    
-                    if (hasPendingJobs || Interlocked.CompareExchange(ref _restartRequested, 0, 0) == 1)
+                    if (hasPendingJobs)
                     {
                         // Thread-safe call to wake up Unity's main thread
                         EditorApplication.QueuePlayerLoopUpdate();
@@ -816,6 +741,7 @@ namespace UnitySkills
                     {
                         if (request.ContentLength64 > MaxBodySizeBytes)
                         {
+                            ReleasePendingSlot();
                             SendImmediateJsonResponse(context, request, 413, new
                             {
                                 error = "Request body too large",
@@ -880,23 +806,16 @@ namespace UnitySkills
                             ReturnRequestJob(job);
                     }
                 }
-                catch (HttpListenerException ex)
+                catch (HttpListenerException)
                 {
                     if (!_isRunning) break;
-                    RequestServerRecovery($"HttpListener exception ({ex.ErrorCode}): {ex.Message}");
-                    break;
+                    Thread.Sleep(500); // avoid tight exception loop; watchdog will restart if needed
                 }
-                catch (ObjectDisposedException)
+                catch (ObjectDisposedException) { break; } // listener destroyed; watchdog will restart
+                catch (Exception)
                 {
                     if (!_isRunning) break;
-                    RequestServerRecovery("Listener disposed unexpectedly");
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    if (!_isRunning) break;
-                    RequestServerRecovery($"Listener loop exception: {ex.GetType().Name}: {ex.Message}");
-                    break;
+                    Thread.Sleep(1000); // back off on unknown error; watchdog will intervene
                 }
             }
         }
@@ -1023,20 +942,13 @@ namespace UnitySkills
                     job.CompletionSignal?.Set();
                     Interlocked.Increment(ref _totalRequestsProcessed);
                     GameObjectFinder.InvalidateCache();
-                    if (job.ResponseDispatched)
-                        ReturnRequestJob(job);
                 }
-                
+
                 processed++;
             }
 
             double now = EditorApplication.timeSinceStartup;
 
-            if (Interlocked.CompareExchange(ref _restartRequested, 0, 0) == 1)
-            {
-                AttemptServerRecovery(now);
-            }
-            
             // Heartbeat for Registry
             if (_isRunning)
             {
@@ -1050,12 +962,15 @@ namespace UnitySkills
                 if (now - _lastWatchdogCheck > WatchdogInterval)
                 {
                     _lastWatchdogCheck = now;
-                    bool listenerHealthy = IsListenerHealthy();
+                    bool listenerDead = _listenerThread == null || !_listenerThread.IsAlive;
+                    bool listenerNotListening = _listener == null || !_listener.IsListening;
 
-                    if (!listenerHealthy)
+                    if (listenerDead || listenerNotListening)
                     {
-                        RequestServerRecovery("Watchdog detected unhealthy listener");
-                        AttemptServerRecovery(now);
+                        SkillsLogger.LogWarning($"Watchdog: server unhealthy (threadAlive={!listenerDead}, listening={!listenerNotListening}), restarting...");
+                        int port = _port;
+                        Stop();
+                        Start(port, fallbackToAuto: true);
                     }
                 }
             }
@@ -1091,11 +1006,6 @@ namespace UnitySkills
                     queuedRequests = QueuedRequests,
                     totalProcessed = _totalRequestsProcessed,
                     autoRestart = AutoStart,
-                    restartPending = Interlocked.CompareExchange(ref _restartRequested, 0, 0) == 1,
-                    listenerHealthy = IsListenerHealthy(),
-                    isCompiling = ServerAvailabilityHelper.IsCompilationInProgress(),
-                    keepAliveIntervalSeconds = KeepAliveIntervalSeconds,
-                    watchdogIntervalSeconds = WatchdogInterval,
                     requestTimeoutMinutes = RequestTimeoutMinutes,
                     domainReloadRecovery = "enabled",
                     architecture = "Producer-Consumer (Thread-Safe)",
