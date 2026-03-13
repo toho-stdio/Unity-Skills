@@ -726,7 +726,7 @@ Create a `PanelSettings` ScriptableObject asset with full property support.
 | `colliderUpdateMode` | string | World Space collider mode (`"Match3DBoundingBox"`, `"Match2DDocumentRect"`, `"KeepExistingCollider"`) |
 | `colliderIsTrigger` | bool | World Space collider is trigger |
 | `vertexBudget` | int | Vertex budget for buffer management |
-| `textureSlotCount` | int | Texture slot count for buffer management |
+| `textureSlotCount` | int | Texture slot count for buffer management (Unity 6.3+) |
 
 **Returns**: `{success, path, scaleMode, referenceResolution, screenMatchMode}`
 
@@ -741,7 +741,7 @@ Read all properties of a `PanelSettings` asset.
 
 **Returns**: `{path, scaleMode, referenceResolution, screenMatchMode, themeStyleSheet, textSettings, targetTexture, targetDisplay, sortingOrder, scale, match, referenceDpi, fallbackDpi, referenceSpritePixelsPerUnit, dynamicAtlasSettings, clearColor, colorClearValue, clearDepthStencil}`
 
-On Unity 6+ also includes: `renderMode, forceGammaRendering, bindingLogLevel, colliderUpdateMode, colliderIsTrigger, vertexBudget, textureSlotCount`
+On Unity 6+ also includes: `renderMode, forceGammaRendering, bindingLogLevel, colliderUpdateMode, colliderIsTrigger, vertexBudget`. On Unity 6.3+ also includes: `textureSlotCount`
 
 ---
 

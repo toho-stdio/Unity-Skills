@@ -418,8 +418,12 @@ namespace UnitySkills
                 bindingLogLevel = settings.bindingLogLevel.ToString(),
                 colliderUpdateMode = colliderUpdateStr,
                 colliderIsTrigger = colliderIsTriggerVal,
+#if UNITY_6000_3_OR_NEWER
                 vertexBudget = settings.vertexBudget,
                 textureSlotCount = (int)settings.textureSlotCount
+#else
+                vertexBudget = settings.vertexBudget
+#endif
             };
 #else
             return new
@@ -736,7 +740,9 @@ namespace UnitySkills
             if (!string.IsNullOrEmpty(bindingLogLevel) && System.Enum.TryParse<UnityEngine.UIElements.BindingLogLevel>(bindingLogLevel, true, out var parsedLogLevel))
                 settings.bindingLogLevel = parsedLogLevel;
             if (vertexBudget.HasValue)     settings.vertexBudget = (uint)vertexBudget.Value;
+#if UNITY_6000_3_OR_NEWER
             if (textureSlotCount.HasValue) settings.textureSlotCount = (TextureSlotCount)textureSlotCount.Value;
+#endif
 
             // renderMode, colliderUpdateMode, and colliderIsTrigger are internal; update them via SerializedObject.
             if (!string.IsNullOrEmpty(renderMode) || !string.IsNullOrEmpty(colliderUpdateMode) || colliderIsTrigger.HasValue)
