@@ -63,7 +63,7 @@ Window > UnitySkills > Start Server
 Window > UnitySkills > Skill Installer
 ```
 
-选择目标 AI 工具后执行安装。安装器会复制完整的 `unity-skills/` 模板目录，而不是只写一个入口文件。
+选择目标 AI 工具后执行安装。安装器会复制包内的 `unity-skills~/` 模板目录到目标位置。
 
 目标目录应至少包含：
 
@@ -74,7 +74,7 @@ Window > UnitySkills > Skill Installer
 
 ### 手动安装
 
-如果不使用安装器，请把仓库中的整个 `unity-skills/` 目录复制到你的 AI 工具技能目录中。
+如果不使用安装器，请把 UPM 包内的 `SkillsForUnity/unity-skills~/` 目录内容复制到你的 AI 工具技能目录中。
 
 常见目录：
 
@@ -88,7 +88,7 @@ Window > UnitySkills > Skill Installer
 
 ## Python 客户端行为
 
-`unity-skills/scripts/unity_skills.py` 当前具备以下行为：
+`unity_skills.py` 当前具备以下行为：
 
 - 默认请求超时为 `900` 秒，也就是 `15 分钟`
 - 初始化时会从 `/health` 同步服务端超时设置
@@ -187,5 +187,5 @@ unity_skills.call_skill(
 
 - [中文 README](../README.md)
 - [English README](../README_EN.md)
-- [AI Skill 入口](../unity-skills/SKILL.md)
+- [AI Skill 入口](../SkillsForUnity/unity-skills~/SKILL.md)
 - [更新日志](../CHANGELOG.md)

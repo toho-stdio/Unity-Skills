@@ -93,7 +93,7 @@ In Unity, click menu: `Window > UnitySkills > Start Server`
 2. Select the corresponding terminal icon (Claude / Antigravity / Gemini / Codex).
 3. Click **"Install"** to complete the environment configuration without manual code copying.
 
-> The installer copies the complete `unity-skills/` template directory.
+> The installer copies the `unity-skills~/` template directory from the package to the target location.
 >
 > Installer output files (generated in target directory):
 > - `SKILL.md`
@@ -114,9 +114,9 @@ If one-click installation is not supported or preferred, follow this **standard 
 1. **Custom Installation**: In the installation interface, select the "Custom Path" option to install Skills to any directory you specify (e.g., `Assets/MyTools/AI`) for easier project management.
 
 #### ✅ Standard Installation Method B
-1. **Locate Skills Source Directory**: The `unity-skills/` directory in this repository is the distributable Skills template (root directory contains `SKILL.md`).
+1. **Locate Skills Source Directory**: The `SkillsForUnity/unity-skills~/` directory in the UPM package is the distributable Skills template (root directory contains `SKILL.md`).
 2. **Find the Tool's Skills Root Directory**: Different tools have different paths; refer to the tool's documentation first.
-3. **Copy Completely**: Copy the entire `unity-skills/` directory to the tool's Skills root directory.
+3. **Copy Completely**: Copy the entire contents of `unity-skills~/` to the tool's Skills root directory (rename to `unity-skills/`).
 4. **Create agent_config.json**: Create an `agent_config.json` file in the `unity-skills/scripts/` directory:
    ```json
    {"agentId": "your-agent-name", "installedAt": "2026-02-11T00:00:00Z"}
@@ -199,6 +199,12 @@ If you're using other tools that support Skills, install according to the Skills
 .
 ├── SkillsForUnity/                 # Unity Editor Plugin (UPM Package)
 │   ├── package.json                # com.besty.unity-skills
+│   ├── unity-skills~/              # Cross-platform AI Skill Template (tilde-hidden, bundled with package)
+│   │   ├── SKILL.md                # Main Skill Definitions (AI-readable)
+│   │   ├── scripts/
+│   │   │   └── unity_skills.py     # Python Client Library
+│   │   ├── skills/                 # Modular Skill Documentation + 13 advisory modules
+│   │   └── references/             # Unity Development References
 │   └── Editor/Skills/              # Core Skill Logic (38 *Skills.cs files, 448 Skills)
 │       ├── SkillsHttpServer.cs     # HTTP Server Core (Producer-Consumer)
 │       ├── SkillRouter.cs          # Request Routing & Reflection-based Skill Discovery
@@ -212,12 +218,6 @@ If you're using other tools that support Skills, install according to the Skills
 │       ├── WorkflowSkills.cs       # Workflow Undo/Rollback (22 skills)
 │       ├── PerceptionSkills.cs     # Scene Understanding (11 skills)
 │       └── ...                     # 448 Skills source code
-├── unity-skills/                   # Cross-platform AI Skill Template (Distributed to AI Tools)
-│   ├── SKILL.md                    # Main Skill Definitions (AI-readable)
-│   ├── scripts/
-│   │   └── unity_skills.py         # Python Client Library
-│   ├── skills/                     # Modular Skill Documentation + 13 advisory modules
-│   └── references/                 # Unity Development References
 ├── docs/
 │   └── SETUP_GUIDE.md              # Complete Setup & Usage Guide
 ├── CHANGELOG.md                    # Version Update Log

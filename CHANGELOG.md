@@ -11,6 +11,7 @@ All notable changes to **UnitySkills** will be documented in this file.
 
 ### Changed
 - **Unity 维护基线**：后续新增功能、回归验证与文档基线统一收敛到 `Unity 2022.3+`，当前重点适配目标为 `2022.3+ / Unity 6`。
+- **Skill 模板目录迁移**：根目录 `unity-skills/` 已移入 UPM 包内 `SkillsForUnity/unity-skills~/`（波浪线隐藏目录），通过 `?path=SkillsForUnity` 安装时自动随包分发，无需完整克隆仓库。
 - **默认请求超时统一**：Unity 服务端、Python 客户端和用户文档统一以 **15 分钟** 作为默认超时。
 - **脚本生成建议增强**：创建脚本相关提示中，明确要求 AI 主动考虑耦合性、性能、可维护性与 Inspector 体验，而不是只生成可运行代码。
 - **文档与安装说明同步**：更新 `README.md`、`README_EN.md`、`docs/SETUP_GUIDE.md`、`unity-skills/SKILL.md`、`.github` 文档等，补充 `447` 个 REST Skills、`13` 个 advisory 模块、完整 `unity-skills/` 模板目录与编译期短暂不可达说明。

@@ -94,7 +94,7 @@ https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity#v1.6.0
 2. 选择对应的终端图标（Claude / Antigravity / Gemini / Codex）。
 3. 点击 **"Install"** 即可完成环境配置，无需手动拷贝代码。
 
-> 安装器会复制完整的 `unity-skills/` 模板目录。
+> 安装器会复制包内的 `unity-skills~/` 模板目录到目标位置。
 >
 > 安装器落盘文件说明（生成于目标目录）：
 > - `SKILL.md`
@@ -115,9 +115,9 @@ https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity#v1.6.0
 1. **自定义安装**：在安装界面选择 "Custom Path" 选项，将 Skills 安装到任意指定目录（例如 `Assets/MyTools/AI`），方便项目管理。
 
 #### ✅ 标准安装规范 B
-1. **定位 Skills 源码目录**：本仓库的 `unity-skills/` 即为可分发的 Skills 模板（根目录包含 `SKILL.md`）。
+1. **定位 Skills 源码目录**：UPM 包内的 `SkillsForUnity/unity-skills~/` 即为可分发的 Skills 模板（根目录包含 `SKILL.md`）。
 2. **找到工具的 Skills 根目录**：不同工具路径不同，优先以该工具文档为准。
-3. **完整复制**：将整个 `unity-skills/` 目录复制到工具的 Skills 根目录下。
+3. **完整复制**：将整个 `unity-skills~/` 目录内容复制到工具的 Skills 根目录下（重命名为 `unity-skills/`）。
 4. **创建 agent_config.json**：在 `unity-skills/scripts/` 目录下创建 `agent_config.json` 文件：
    ```json
    {"agentId": "your-agent-name", "installedAt": "2026-02-11T00:00:00Z"}
@@ -200,6 +200,12 @@ https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity#v1.6.0
 .
 ├── SkillsForUnity/                 # Unity 编辑器插件 (UPM Package)
 │   ├── package.json                # com.besty.unity-skills
+│   ├── unity-skills~/              # 跨平台 AI Skill 模板 (波浪线隐藏目录, 随包分发)
+│   │   ├── SKILL.md                # 主 Skill 定义 (AI 读取)
+│   │   ├── scripts/
+│   │   │   └── unity_skills.py     # Python 客户端库
+│   │   ├── skills/                 # 按模块分类的 Skill 文档 + 13 个 advisory 模块
+│   │   └── references/             # Unity 开发参考文档
 │   └── Editor/Skills/              # 核心 Skill 逻辑 (38 个 *Skills.cs, 共 448 Skills)
 │       ├── SkillsHttpServer.cs     # HTTP 服务器核心 (Producer-Consumer)
 │       ├── SkillRouter.cs          # 请求路由 & 反射发现 Skills
@@ -213,12 +219,6 @@ https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity#v1.6.0
 │       ├── WorkflowSkills.cs       # Workflow 撤销/回滚 (22 skills)
 │       ├── PerceptionSkills.cs     # 场景理解 (11 skills)
 │       └── ...                     # 448 Skills 源码
-├── unity-skills/                   # 跨平台 AI Skill 模板 (分发给 AI 工具)
-│   ├── SKILL.md                    # 主 Skill 定义 (AI 读取)
-│   ├── scripts/
-│   │   └── unity_skills.py         # Python 客户端库
-│   ├── skills/                     # 按模块分类的 Skill 文档 + 13 个 advisory 模块
-│   └── references/                 # Unity 开发参考文档
 ├── docs/
 │   └── SETUP_GUIDE.md              # 完整安装使用指南
 ├── CHANGELOG.md                    # 版本更新记录

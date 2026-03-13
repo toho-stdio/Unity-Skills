@@ -94,6 +94,12 @@
 Unity-Skills/
 ├── SkillsForUnity/                 # Unity 编辑器插件 (UPM Package)
 │   ├── package.json                # com.besty.unity-skills
+│   ├── unity-skills~/              # 跨平台 AI Skill 模板 (波浪线隐藏目录, 随包分发)
+│   │   ├── SKILL.md                # 主 Skill 定义 (AI 读取)
+│   │   ├── scripts/
+│   │   │   └── unity_skills.py     # Python 客户端库
+│   │   ├── skills/                 # 按模块分类的 Skill 文档（含 13 个 advisory 模块）
+│   │   └── references/             # Unity 开发参考文档
 │   └── Editor/
 │       └── Skills/
 │           ├── SkillsHttpServer.cs     # HTTP 服务器核心 (Producer-Consumer)
@@ -146,20 +152,6 @@ Unity-Skills/
 │           ├── PerceptionSkills.cs     # Perception 场景理解 (11 skills)
 │           ├── SampleSkills.cs         # 基础示例 (8 skills)
 │           └── ... (38 个 *Skills.cs 文件, 共 448 Skills)
-│
-├── unity-skills/                   # 跨平台 AI Skill 模板 (分发给 AI 工具)
-│   ├── SKILL.md                    # 主 Skill 定义 (AI 读取)
-│   ├── scripts/
-│   │   └── unity_skills.py         # Python 客户端库
-│   ├── skills/                     # 按模块分类的 Skill 文档（含 13 个 advisory 模块）
-│   │   ├── gameobject/SKILL.md
-│   │   ├── component/SKILL.md
-│   │   ├── material/SKILL.md
-│   │   └── ...
-│   └── references/                 # Unity 开发参考文档
-│       ├── 2d.md, 3d.md, physics.md
-│       ├── shaders.md, ui.md
-│       └── ...
 │
 ├── docs/
 │   └── SETUP_GUIDE.md              # 完整安装使用指南
@@ -458,10 +450,10 @@ public static class MyCustomSkills
 
 | 文件 | 用途 |
 |------|------|
-| [SKILL.md](unity-skills/SKILL.md) | 完整 Skill API 参考 |
+| [SKILL.md](SkillsForUnity/unity-skills~/SKILL.md) | 完整 Skill API 参考 |
 | [SETUP_GUIDE.md](docs/SETUP_GUIDE.md) | 详细安装使用指南 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本更新记录 |
-| [references/](unity-skills/references/) | Unity 开发参考文档 |
+| [references/](SkillsForUnity/unity-skills~/references/) | Unity 开发参考文档 |
 
 ---
 
@@ -475,12 +467,12 @@ public static class MyCustomSkills
 | 2 | `agent.md` | 顶部概览表格中的 `\| **版本** \|` 等关键信息 |
 | 3 | `SkillsForUnity/package.json` | `"version": "x.x.x"` |
 | 4 | `CHANGELOG.md` | 顶部新增 `## [x.x.x] - YYYY-MM-DD` 条目 |
-| 5 | `unity-skills/scripts/unity_skills.py` | `__version__ = "x.x.x"` |
+| 5 | `SkillsForUnity/unity-skills~/scripts/unity_skills.py` | `__version__ = "x.x.x"` |
 | 6 | `README.md` | Git URL 示例、技能数、Unity 基线、超时与安装说明 |
 | 7 | `README_EN.md` | Git URL 示例、技能数、Unity 基线、超时与安装说明 |
 | 8 | `docs/SETUP_GUIDE.md` | 安装、超时、目录结构与使用说明 |
-| 9 | `unity-skills/SKILL.md` | 根 Skill 快照、说明与路由提示 |
-| 10 | `unity-skills/skills/SKILL.md` | 模块索引、覆盖范围与 advisory 说明 |
+| 9 | `SkillsForUnity/unity-skills~/SKILL.md` | 根 Skill 快照、说明与路由提示 |
+| 10 | `SkillsForUnity/unity-skills~/skills/SKILL.md` | 模块索引、覆盖范围与 advisory 说明 |
 
 ### 额外约束
 
@@ -491,7 +483,7 @@ public static class MyCustomSkills
 
 ```bash
 # 检查统一版本源与主要文档是否一致
-rg -n "1\.6\.2|2022\.3\+|448|15 分钟|15 minutes|SkillsLogger.Version|__version__" agent.md CHANGELOG.md README.md README_EN.md docs/SETUP_GUIDE.md unity-skills/SKILL.md unity-skills/skills/SKILL.md SkillsForUnity/package.json unity-skills/scripts/unity_skills.py SkillsForUnity/Editor/Skills/SkillsLogger.cs
+rg -n "1\.6\.2|2022\.3\+|448|15 分钟|15 minutes|SkillsLogger.Version|__version__" agent.md CHANGELOG.md README.md README_EN.md docs/SETUP_GUIDE.md SkillsForUnity/unity-skills~/SKILL.md SkillsForUnity/unity-skills~/skills/SKILL.md SkillsForUnity/package.json SkillsForUnity/unity-skills~/scripts/unity_skills.py SkillsForUnity/Editor/Skills/SkillsLogger.cs
 ```
 
 ---

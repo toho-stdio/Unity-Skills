@@ -73,18 +73,18 @@ Update **10 locations** when releasing | 发布时需同步更新 10 处：
 | `agent.md` | Version table and release notes |
 | `SkillsForUnity/package.json` | `"version"` field |
 | `CHANGELOG.md` | Add new entry at top |
-| `unity-skills/scripts/unity_skills.py` | `__version__` |
+| `SkillsForUnity/unity-skills~/scripts/unity_skills.py` | `__version__` |
 | `README.md` | Release URL/version references and counts |
 | `README_EN.md` | Release URL/version references and counts |
 | `docs/SETUP_GUIDE.md` | Timeout, baseline, and installation details |
-| `unity-skills/SKILL.md` | Root skill snapshot and behavior notes |
-| `unity-skills/skills/SKILL.md` | Module index and coverage summary |
+| `SkillsForUnity/unity-skills~/SKILL.md` | Root skill snapshot and behavior notes |
+| `SkillsForUnity/unity-skills~/skills/SKILL.md` | Module index and coverage summary |
 
 > If Unity baseline, skill counts, advisory-module counts, or install layout change, also update the matching `.github` docs/templates. | 若 Unity 基线、技能数、advisory 模块数或安装结构有变化，也要同步更新 `.github` 下相关文档和模板。
 
 Verify command | 检查命令：
 ```bash
-rg -n "1\\.6\\.2|2022\\.3\\+|447|15 分钟|15 minutes|SkillsLogger.Version|__version__" agent.md CHANGELOG.md README.md README_EN.md docs/SETUP_GUIDE.md unity-skills/SKILL.md unity-skills/skills/SKILL.md SkillsForUnity/package.json unity-skills/scripts/unity_skills.py SkillsForUnity/Editor/Skills/SkillsLogger.cs
+rg -n "1\\.6\\.2|2022\\.3\\+|447|15 分钟|15 minutes|SkillsLogger.Version|__version__" agent.md CHANGELOG.md README.md README_EN.md docs/SETUP_GUIDE.md SkillsForUnity/unity-skills~/SKILL.md SkillsForUnity/unity-skills~/skills/SKILL.md SkillsForUnity/package.json SkillsForUnity/unity-skills~/scripts/unity_skills.py SkillsForUnity/Editor/Skills/SkillsLogger.cs
 ```
 
 ## Feedback | 问题反馈
