@@ -3,6 +3,7 @@ using UnityEditor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Reflection;
 
 #if PROBUILDER
 using UnityEngine.ProBuilder;
@@ -635,7 +636,9 @@ namespace UnitySkills
             var go = pbMesh.gameObject;
             var renderer = pbMesh.GetComponent<MeshRenderer>();
             var bounds = pbMesh.GetComponent<MeshFilter>()?.sharedMesh?.bounds ?? new Bounds();
-            var pbShape = go.GetComponent<ProBuilderShape>();
+
+            // ProBuilderShape is internal — use reflection to get shape type name
+            var shapeTypeName = GetShapeTypeName(go);
 
             // Collect submesh info
             var submeshes = new Dictionary<int, int>();
@@ -656,7 +659,7 @@ namespace UnitySkills
                 faceCount = pbMesh.faceCount,
                 edgeCount = pbMesh.edgeCount,
                 triangleCount = pbMesh.triangleCount,
-                shapeType = pbShape?.shape?.GetType().Name ?? "Unknown",
+                shapeType = shapeTypeName,
                 position = new { x = go.transform.position.x, y = go.transform.position.y, z = go.transform.position.z },
                 bounds = new { center = new { x = bounds.center.x, y = bounds.center.y, z = bounds.center.z }, size = new { x = bounds.size.x, y = bounds.size.y, z = bounds.size.z } },
                 materials = renderer?.sharedMaterials?.Select((m, i) => new { index = i, name = m != null ? m.name : "(null)" }).ToArray(),
@@ -731,7 +734,9 @@ namespace UnitySkills
             Undo.RecordObject(pbMesh, "Project UV");
             WorkflowManager.SnapshotObject(pbMesh);
 
-            UVEditing.ProjectFacesBox(pbMesh, faces.ToArray(), channel);
+            // UVEditing is internal — use reflection
+            if (!InvokeProjectFacesBox(pbMesh, faces.ToArray(), channel))
+                return new { error = "Failed to project UVs. UVEditing.ProjectFacesBox is not accessible in this ProBuilder version." };
 
             pbMesh.ToMesh();
             pbMesh.Refresh();
@@ -771,8 +776,8 @@ namespace UnitySkills
             go.transform.position = pos;
             go.transform.eulerAngles = rot;
 
-            var pbShape = go.GetComponent<ProBuilderShape>();
-            if (pbShape != null) pbShape.size = size;
+            // ProBuilderShape is internal — use reflection to set size
+            SetShapeSize(go, size);
 
             if (!string.IsNullOrEmpty(parentName))
             {
@@ -783,6 +788,60 @@ namespace UnitySkills
             pbMesh.ToMesh();
             pbMesh.Refresh();
             return pbMesh;
+        }
+
+        // ProBuilderShape is internal in ProBuilder 5.x — reflection helpers
+
+        private static Type _pbShapeType;
+        private static PropertyInfo _pbShapeSizeProp;
+        private static PropertyInfo _pbShapeShapeProp;
+
+        private static void SetShapeSize(GameObject go, Vector3 size)
+        {
+            if (_pbShapeType == null)
+                _pbShapeType = typeof(ProBuilderMesh).Assembly.GetType("UnityEngine.ProBuilder.Shapes.ProBuilderShape");
+            if (_pbShapeType == null) return;
+
+            var comp = go.GetComponent(_pbShapeType);
+            if (comp == null) return;
+
+            if (_pbShapeSizeProp == null)
+                _pbShapeSizeProp = _pbShapeType.GetProperty("size", BindingFlags.Public | BindingFlags.Instance);
+            _pbShapeSizeProp?.SetValue(comp, size);
+        }
+
+        private static string GetShapeTypeName(GameObject go)
+        {
+            if (_pbShapeType == null)
+                _pbShapeType = typeof(ProBuilderMesh).Assembly.GetType("UnityEngine.ProBuilder.Shapes.ProBuilderShape");
+            if (_pbShapeType == null) return "Unknown";
+
+            var comp = go.GetComponent(_pbShapeType);
+            if (comp == null) return "Unknown";
+
+            if (_pbShapeShapeProp == null)
+                _pbShapeShapeProp = _pbShapeType.GetProperty("shape", BindingFlags.Public | BindingFlags.Instance);
+            var shape = _pbShapeShapeProp?.GetValue(comp);
+            return shape?.GetType().Name ?? "Unknown";
+        }
+
+        // UVEditing is internal in ProBuilder 5.x — reflection helper
+
+        private static MethodInfo _projectFacesBoxMethod;
+
+        private static bool InvokeProjectFacesBox(ProBuilderMesh mesh, Face[] faces, int channel)
+        {
+            if (_projectFacesBoxMethod == null)
+            {
+                var uvType = typeof(ProBuilderMesh).Assembly.GetType("UnityEngine.ProBuilder.MeshOperations.UVEditing");
+                if (uvType == null) return false;
+                _projectFacesBoxMethod = uvType.GetMethod("ProjectFacesBox",
+                    BindingFlags.Public | BindingFlags.Static,
+                    null, new[] { typeof(ProBuilderMesh), typeof(Face[]), typeof(int) }, null);
+            }
+            if (_projectFacesBoxMethod == null) return false;
+            _projectFacesBoxMethod.Invoke(null, new object[] { mesh, faces, channel });
+            return true;
         }
 #endif
 
