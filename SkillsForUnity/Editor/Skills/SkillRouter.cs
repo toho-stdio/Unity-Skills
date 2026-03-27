@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 namespace UnitySkills
 {
     /// <summary>
-    /// Routes REST API requests to skill methods.
+    /// Routes transport requests to skill methods.
     /// </summary>
     public static class SkillRouter
     {
@@ -17,6 +17,15 @@ namespace UnitySkills
         private static volatile bool _initialized;
         private static string _cachedManifest;
         private static readonly object _initLock = new object();
+
+        public static int SkillCount
+        {
+            get
+            {
+                Initialize();
+                return _skills?.Count ?? 0;
+            }
+        }
 
         // Skills that trigger auto-workflow recording (modification operations)
         private static readonly HashSet<string> _workflowTrackedSkills = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -466,4 +475,3 @@ namespace UnitySkills
         }
     }
 }
-

@@ -8,7 +8,8 @@
   "licensesUrl": "https://github.com/Besty0728/Unity-Skills/blob/main/LICENSE",
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.0.2",
-    "com.unity.timeline": "1.7.7"
+    "com.unity.timeline": "1.7.7",
+    "com.unity.test-framework": "1.1.31"
   },
   "keywords": [
     "unity",
@@ -23,6 +24,11 @@
     "url": "https://github.com/Besty0728"
   },
   "versionDefines": [
+    {
+      "name": "com.unity.test-framework",
+      "expression": "",
+      "define": "HAS_UNITY_TEST_FRAMEWORK"
+    },
     {
       "name": "com.unity.cinemachine",
       "expression": "[2.0,3.0)",

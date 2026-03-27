@@ -6,7 +6,9 @@
         "Unity.Timeline",
         "Cinemachine",
         "Unity.Cinemachine",
-        "Unity.Splines"
+        "Unity.Splines",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": ["Editor"],
     "excludePlatforms": [],
@@ -16,6 +18,11 @@
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [
+        {
+            "name": "com.unity.test-framework",
+            "expression": "",
+            "define": "HAS_UNITY_TEST_FRAMEWORK"
+        },
         {
             "name": "com.unity.cinemachine",
             "expression": "[2.0,3.0)",

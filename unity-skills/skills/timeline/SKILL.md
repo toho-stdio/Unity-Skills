@@ -1,6 +1,6 @@
 ---
 name: unity-timeline
-description: "Unity Timeline operations. Use when users want to create timelines or add animation/audio tracks. Triggers: timeline, cutscene, sequence, track, clip, playable, 时间�? 过场动画, 轨道."
+description: "Unity Timeline operations. Use when users want to create timelines or add animation/audio tracks. Triggers: timeline, cutscene, sequence, track, clip, playable, 时间? 过场动画, 轨道."
 ---
 
 # Timeline Skills

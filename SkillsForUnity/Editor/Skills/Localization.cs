@@ -49,10 +49,10 @@ namespace UnitySkills
         {
             // Window
             {"window_title", "UnitySkills"},
-            {"server_running", "● Server Running"},
-            {"server_stopped", "● Server Stopped"},
-            {"start_server", "Start Server"},
-            {"stop_server", "Stop Server"},
+            {"server_running", "● Transport Running"},
+            {"server_stopped", "● Transport Stopped"},
+            {"start_server", "Start Transport"},
+            {"stop_server", "Stop Transport"},
             {"test_skill", "Test Skill"},
             {"skill_name", "Skill Name"},
             {"parameters_json", "Parameters (JSON)"},
@@ -611,10 +611,10 @@ namespace UnitySkills
         {
             // Window
             {"window_title", "UnitySkills"},
-            {"server_running", "● 服务器运行中"},
-            {"server_stopped", "● 服务器已停止"},
-            {"start_server", "启动服务器"},
-            {"stop_server", "停止服务器"},
+            {"server_running", "● 传输服务运行中"},
+            {"server_stopped", "● 传输服务已停止"},
+            {"start_server", "启动传输服务"},
+            {"stop_server", "停止传输服务"},
             {"test_skill", "测试 Skill"},
             {"skill_name", "Skill 名称"},
             {"parameters_json", "参数 (JSON)"},

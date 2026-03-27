@@ -45,7 +45,7 @@ namespace UnitySkills
              // Assembly reload cleanup handled by SkillsHttpServer calling Stop()
         }
 
-        public static void Register(int port)
+        public static void Register(string queueRoot, string pendingDirectory, string resultsDirectory, int requestTimeoutMinutes)
         {
             try
             {
@@ -56,10 +56,14 @@ namespace UnitySkills
                         id = InstanceId,
                         name = ProjectName,
                         path = ProjectPath,
-                        port = port,
                         pid = System.Diagnostics.Process.GetCurrentProcess().Id,
                         last_active = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                        unityVersion = Application.unityVersion
+                        unityVersion = Application.unityVersion,
+                        transport = "file",
+                        queueRoot = queueRoot,
+                        pendingDirectory = pendingDirectory,
+                        resultsDirectory = resultsDirectory,
+                        requestTimeoutMinutes = requestTimeoutMinutes
                     };
 
                     registry[ProjectPath] = info;
@@ -73,7 +77,7 @@ namespace UnitySkills
                     foreach (var key in keysToRemove)
                         registry.Remove(key);
                 });
-                SkillsLogger.LogVerbose($"Registered instance '{InstanceId}' on port {port}");
+                SkillsLogger.LogVerbose($"Registered instance '{InstanceId}' with queue {queueRoot}");
             }
             catch (Exception ex)
             {
@@ -98,10 +102,9 @@ namespace UnitySkills
             }
         }
 
-        public static void Heartbeat(int port)
+        public static void Heartbeat(string queueRoot, string pendingDirectory, string resultsDirectory, int requestTimeoutMinutes)
         {
-             // Re-register which updates the timestamp
-             Register(port);
+             Register(queueRoot, pendingDirectory, resultsDirectory, requestTimeoutMinutes);
         }
 
         /// <summary>
@@ -196,10 +199,14 @@ namespace UnitySkills
             public string id;
             public string name;
             public string path;
-            public int port;
             public int pid;
             public long last_active;
             public string unityVersion;
+            public string transport;
+            public string queueRoot;
+            public string pendingDirectory;
+            public string resultsDirectory;
+            public int requestTimeoutMinutes;
         }
     }
 }

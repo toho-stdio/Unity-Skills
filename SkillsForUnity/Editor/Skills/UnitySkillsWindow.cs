@@ -7,8 +7,8 @@ using System.Collections.Generic;
 namespace UnitySkills
 {
     /// <summary>
-    /// Unity Editor Window for UnitySkills REST API control.
-    /// Also acts as a backup heartbeat to ensure server responsiveness.
+    /// Unity Editor Window for UnitySkills transport control.
+    /// Also acts as a backup heartbeat to ensure transport responsiveness.
     /// </summary>
     public class UnitySkillsWindow : EditorWindow
     {
@@ -200,16 +200,17 @@ namespace UnitySkills
                     DrawColoredLabel(Localization.Current == Localization.Language.Chinese ? "连接信息" : "Connection Info", AccentColor, true);
                     EditorGUILayout.Space(4);
 
-                    var portLabel = Localization.Current == Localization.Language.Chinese ? "端口" : "Port";
-                    EditorGUILayout.LabelField($"{portLabel}: {SkillsHttpServer.Port}");
+                    var queueLabel = Localization.Current == Localization.Language.Chinese ? "队列根目录" : "Queue Root";
+                    EditorGUILayout.LabelField($"{queueLabel}:");
+                    EditorGUILayout.SelectableLabel(SkillsHttpServer.QueueRoot, EditorStyles.textField, GUILayout.Height(18));
                     EditorGUILayout.LabelField($"ID: {RegistryService.InstanceId}");
 
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("URL:", GUILayout.Width(35));
-                    EditorGUILayout.SelectableLabel(SkillsHttpServer.Url, EditorStyles.textField, GUILayout.Height(18));
+                    EditorGUILayout.LabelField(Localization.Current == Localization.Language.Chinese ? "结果目录:" : "Results:", GUILayout.Width(60));
+                    EditorGUILayout.SelectableLabel(SkillsHttpServer.ResultsDirectory, EditorStyles.textField, GUILayout.Height(18));
                     if (GUILayout.Button(Localization.Current == Localization.Language.Chinese ? "复制" : "Copy", GUILayout.Width(50)))
                     {
-                        EditorGUIUtility.systemCopyBuffer = RegistryService.InstanceId;
+                        EditorGUIUtility.systemCopyBuffer = SkillsHttpServer.QueueRoot;
                     }
                     EditorGUILayout.EndHorizontal();
                 });
@@ -249,18 +250,10 @@ namespace UnitySkills
                 }
                 DrawColoredLabel(L("auto_restart_hint"), MutedColor, false);
 
-                // Preferred Port
-                EditorGUILayout.BeginHorizontal();
-                var portLabel = Localization.Current == Localization.Language.Chinese ? "启动端口" : "Port";
-                EditorGUILayout.LabelField(portLabel + ":", GUILayout.Width(60));
-                var portOptions = new[] { "Auto", "8090", "8091", "8092", "8093", "8094", "8095", "8096", "8097", "8098", "8099", "8100" };
-                var currentIdx = SkillsHttpServer.PreferredPort == 0 ? 0 : SkillsHttpServer.PreferredPort - 8089;
-                var newIdx = EditorGUILayout.Popup(currentIdx, portOptions);
-                if (newIdx != currentIdx)
-                {
-                    SkillsHttpServer.PreferredPort = newIdx == 0 ? 0 : 8089 + newIdx;
-                }
-                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.LabelField(
+                    Localization.Current == Localization.Language.Chinese
+                        ? "传输方式: 文件队列（自动发现）"
+                        : "Transport: file queue (auto-discovery)");
 
                 // Request Timeout
                 EditorGUILayout.BeginHorizontal();

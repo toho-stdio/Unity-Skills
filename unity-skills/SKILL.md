@@ -1,11 +1,11 @@
 ---
 name: unity-skills
-description: "Unity Editor automation via REST API. Use when users want to create, modify, or manage GameObjects, components, scenes, materials, prefabs, lights, UI elements, or any Unity Editor operations. Triggers on: Unity, GameObject, prefab, scene, material, component, animator, shader, UI canvas, lighting setup, asset import, play mode, editor automation, Unity编辑�? Unity自动�? Unity场景, Unity物体, Unity组件, Unity材质, Unity预制�? Unity灯光, Unity动画, Unity脚本."
+description: "Unity Editor automation via file-based command queues. Use when users want to create, modify, or manage GameObjects, components, scenes, materials, prefabs, lights, UI elements, or any Unity Editor operations. Triggers on: Unity, GameObject, prefab, scene, material, component, animator, shader, UI canvas, lighting setup, asset import, play mode, editor automation, Unity编辑? Unity自动? Unity场景, Unity物体, Unity组件, Unity材质, Unity预制? Unity灯光, Unity动画, Unity脚本."
 ---
 
 # Unity Skills API
 
-> **RULE**: 2+ objects �?use `*_batch` skill (1 call vs N calls)
+> **RULE**: 2+ objects ?use `*_batch` skill (1 call vs N calls)
 
 ## Version Routing (Multi-Instance)
 
@@ -26,7 +26,7 @@ unity_skills.set_unity_version("2021")   # Unity 2021.x
 | "2022" / "Unity 2022" | `set_unity_version("2022")` |
 | "2021" / "Unity 2021" | `set_unity_version("2021")` |
 
-`list_instances()` �?returns all running instances with `unityVersion`, `port`, `name`
+`list_instances()` ?returns all running instances with `unityVersion`, `queueRoot`, `name`
 
 ## Batch Skills (Use First!)
 
@@ -67,12 +67,12 @@ unity_skills.set_unity_version("2021")   # Unity 2021.x
 |-------|------------|
 | `gameobject_create` | name?, primitiveType?, x?, y?, z?, parentName? |
 | `gameobject_delete` | name?, instanceId?, path? |
-| `gameobject_find` | name?, tag?, layer?, component?, useRegex?, limit? �?returns list |
+| `gameobject_find` | name?, tag?, layer?, component?, useRegex?, limit? ?returns list |
 | `gameobject_get_info` | name?, instanceId?, path? |
 | `gameobject_set_transform` | name, posX?, posY?, posZ?, rotX?, rotY?, rotZ?, scaleX?, scaleY?, scaleZ? |
 | `gameobject_set_parent` | name, parentName |
 | `gameobject_set_active` | name, active |
-| `gameobject_duplicate` | name?, instanceId? �?returns copyName, copyInstanceId |
+| `gameobject_duplicate` | name?, instanceId? ?returns copyName, copyInstanceId |
 | `gameobject_rename` | name?, instanceId?, newName |
 
 primitiveType: Cube, Sphere, Capsule, Cylinder, Plane, Quad, Empty(null)
@@ -82,7 +82,7 @@ primitiveType: Cube, Sphere, Capsule, Cylinder, Plane, Quad, Empty(null)
 |-------|------------|
 | `component_add` | name, componentType |
 | `component_remove` | name, componentType |
-| `component_list` | name �?returns components[] |
+| `component_list` | name ?returns components[] |
 | `component_set_property` | name, componentType, propertyName, value |
 | `component_get_properties` | name, componentType |
 
@@ -114,8 +114,8 @@ componentType: Rigidbody, BoxCollider, SphereCollider, CapsuleCollider, MeshColl
 | `scene_create` | scenePath |
 | `scene_load` | scenePath, additive? |
 | `scene_save` | scenePath? |
-| `scene_get_info` | (none) �?name, path, isDirty, rootObjects |
-| `scene_get_hierarchy` | maxDepth? �?hierarchy tree |
+| `scene_get_info` | (none) ?name, path, isDirty, rootObjects |
+| `scene_get_hierarchy` | maxDepth? ?hierarchy tree |
 | `scene_screenshot` | filename?, width?, height? |
 
 ### light
@@ -124,7 +124,7 @@ componentType: Rigidbody, BoxCollider, SphereCollider, CapsuleCollider, MeshColl
 | `light_create` | name?, lightType?, x?, y?, z?, r?, g?, b?, intensity?, range?, spotAngle?, shadows? |
 | `light_set_properties` | name, r?, g?, b?, intensity?, range?, shadows? |
 | `light_get_info` | name |
-| `light_find_all` | lightType?, limit? �?returns list |
+| `light_find_all` | lightType?, limit? ?returns list |
 | `light_set_enabled` | name, enabled |
 
 lightType: Directional, Point, Spot, Area | shadows: none, hard, soft
@@ -144,7 +144,7 @@ lightType: Directional, Point, Spot, Area | shadows: none, hard, soft
 | `asset_delete` | assetPath |
 | `asset_move` | sourcePath, destinationPath |
 | `asset_duplicate` | assetPath |
-| `asset_find` | searchFilter, searchInFolders?, limit? �?returns paths |
+| `asset_find` | searchFilter, searchInFolders?, limit? ?returns paths |
 | `asset_create_folder` | folderPath |
 | `asset_refresh` | (none) |
 | `asset_get_info` | assetPath |
@@ -171,9 +171,9 @@ renderMode: ScreenSpaceOverlay, ScreenSpaceCamera, WorldSpace | uiType: Button, 
 | Skill | Parameters |
 |-------|------------|
 | `script_create` | scriptName, folder?, template?, namespace? |
-| `script_read` | scriptPath �?content |
+| `script_read` | scriptPath ?content |
 | `script_delete` | scriptPath |
-| `script_find_in_file` | pattern, folder?, isRegex?, limit? �?matches |
+| `script_find_in_file` | pattern, folder?, isRegex?, limit? ?matches |
 | `script_append` | scriptPath, content, atLine? |
 
 template: MonoBehaviour, ScriptableObject, Editor, EditorWindow
@@ -185,11 +185,11 @@ template: MonoBehaviour, ScriptableObject, Editor, EditorWindow
 | `editor_stop` | (none) |
 | `editor_pause` | (none) |
 | `editor_select` | name?, instanceId?, path? |
-| `editor_get_selection` | (none) �?selected objects with instanceId |
-| `editor_get_context` | includeComponents?, includeChildren? �?selection, assets, scene info |
+| `editor_get_selection` | (none) ?selected objects with instanceId |
+| `editor_get_context` | includeComponents?, includeChildren? ?selection, assets, scene info |
 | `editor_undo` | (none) |
 | `editor_redo` | (none) |
-| `editor_get_state` | (none) �?isPlaying, isPaused, isCompiling |
+| `editor_get_state` | (none) ?isPlaying, isPaused, isCompiling |
 | `editor_execute_menu` | menuPath |
 | `editor_get_tags` | (none) |
 | `editor_get_layers` | (none) |
@@ -330,13 +330,13 @@ animationType: None, Legacy, Generic, Humanoid | meshCompression: Off, Low, Medi
 ### package
 | Skill | Parameters |
 |-------|------------|
-| `package_list` | (none) �?returns installed packages |
-| `package_check` | packageId �?returns installed, version |
+| `package_list` | (none) ?returns installed packages |
+| `package_check` | packageId ?returns installed, version |
 | `package_install` | packageId, version? |
 | `package_remove` | packageId |
 | `package_refresh` | (none) |
 | `package_install_cinemachine` | version? (2 or 3, default 3) |
-| `package_get_cinemachine_status` | (none) �?returns cinemachine/splines status |
+| `package_get_cinemachine_status` | (none) ?returns cinemachine/splines status |
 
 ## Notes
 - Response: `{success: true/false, ...data}` or `{success: false, error: "message"}`

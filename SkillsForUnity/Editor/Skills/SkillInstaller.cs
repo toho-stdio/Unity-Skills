@@ -230,7 +230,7 @@ namespace UnitySkills
         }
 
         private static string AgentsMdPath => Path.Combine(Application.dataPath, "..", "AGENTS.md");
-        private const string UnitySkillsEntry = "- unity-skills: Unity Editor automation via REST API";
+        private const string UnitySkillsEntry = "- unity-skills: Unity Editor automation via file-based command queues";
 
         private static void UpdateAgentsMd()
         {
@@ -299,31 +299,63 @@ This file declares available skills for AI agents like Codex.
 
         private static (bool success, string message) InstallSkill(string targetPath, string name, string agentId)
         {
-            if (!Directory.Exists(targetPath))
-                Directory.CreateDirectory(targetPath);
-
-            // CRITICAL: Use UTF-8 WITHOUT BOM for Gemini CLI compatibility
-            // Gemini CLI cannot parse YAML frontmatter if BOM (EF BB BF) is present at start of file
             var utf8NoBom = new UTF8Encoding(false);
+            if (Directory.Exists(targetPath))
+                Directory.Delete(targetPath, true);
+            Directory.CreateDirectory(targetPath);
 
-            var skillMd = GenerateSkillMd();
-            // Normalize line endings to LF for cross-platform compatibility
-            skillMd = skillMd.Replace("\r\n", "\n");
-            File.WriteAllText(Path.Combine(targetPath, "SKILL.md"), skillMd, utf8NoBom);
+            var templatePath = FindTemplateDirectory();
+            if (!string.IsNullOrEmpty(templatePath))
+            {
+                CopyDirectory(templatePath, targetPath);
+            }
+            else
+            {
+                var skillMd = GenerateSkillMd().Replace("\r\n", "\n");
+                File.WriteAllText(Path.Combine(targetPath, "SKILL.md"), skillMd, utf8NoBom);
 
-            var pythonHelper = GeneratePythonHelper();
-            pythonHelper = pythonHelper.Replace("\r\n", "\n");
-            var scriptsPath = Path.Combine(targetPath, "scripts");
-            if (!Directory.Exists(scriptsPath))
-                Directory.CreateDirectory(scriptsPath);
-            File.WriteAllText(Path.Combine(scriptsPath, "unity_skills.py"), pythonHelper, utf8NoBom);
+                var pythonHelper = GeneratePythonHelper().Replace("\r\n", "\n");
+                var scriptsPath = Path.Combine(targetPath, "scripts");
+                if (!Directory.Exists(scriptsPath))
+                    Directory.CreateDirectory(scriptsPath);
+                File.WriteAllText(Path.Combine(scriptsPath, "unity_skills.py"), pythonHelper, utf8NoBom);
+            }
 
             // Write agent config for automatic agent identification
             var agentConfig = $"{{\"agentId\": \"{agentId}\", \"installedAt\": \"{DateTime.UtcNow:O}\"}}";
-            File.WriteAllText(Path.Combine(scriptsPath, "agent_config.json"), agentConfig, utf8NoBom);
+            var installedScriptsPath = Path.Combine(targetPath, "scripts");
+            if (!Directory.Exists(installedScriptsPath))
+                Directory.CreateDirectory(installedScriptsPath);
+            File.WriteAllText(Path.Combine(installedScriptsPath, "agent_config.json"), agentConfig, utf8NoBom);
 
             SkillsLogger.Log($"Installed skill to: {targetPath} (Agent: {agentId})");
             return (true, targetPath);
+        }
+
+        private static string FindTemplateDirectory()
+        {
+            var candidates = new[]
+            {
+                Path.Combine(Application.dataPath, "..", "unity-skills"),
+                Path.Combine(Application.dataPath, "..", "..", "unity-skills")
+            };
+
+            return candidates.FirstOrDefault(path => Directory.Exists(path) && File.Exists(Path.Combine(path, "SKILL.md")));
+        }
+
+        private static void CopyDirectory(string sourceDir, string targetDir)
+        {
+            foreach (var directory in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
+            {
+                Directory.CreateDirectory(directory.Replace(sourceDir, targetDir));
+            }
+
+            foreach (var file in Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories))
+            {
+                var destination = file.Replace(sourceDir, targetDir);
+                Directory.CreateDirectory(Path.GetDirectoryName(destination));
+                File.Copy(file, destination, true);
+            }
         }
 
         private static string GenerateSkillMd()

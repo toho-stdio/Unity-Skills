@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>基于 REST API 的 AI 驱动型 Unity 编辑器自动化引擎</b><br>
+  <b>基于文件队列的 AI 驱动型 Unity 编辑器自动化引擎</b><br>
   <i>让 AI 通过Skills直接掌控 Unity 场景</i>
 </p>
 
@@ -25,13 +25,13 @@
 ## 🚀 核心特性
 
 - ⚡ **极致效能**：支持 **Result Truncation** 与 **SKILL.md** 瘦身，最大化节省 Token。
-- 🛠️ **全能工具库**：内置 431 Skills，支持 **Batch (批处理)** 操作，大幅减少 HTTP 通信开销，显著提升执行效率。
+- 🛠️ **全能工具库**：内置 431 Skills，支持 **Batch (批处理)** 操作，显著提升本地自动化执行效率。
 - 🛡️ **安全第一**：支持 **Transactional (事务原子性)**，操作失败自动回滚，场景零残留。
-- 🌍 **多实例支持**：自动端口发现、全局注册表，支持同时控制多个 Unity 项目。
+- 🌍 **多实例支持**：自动队列发现、全局注册表，支持同时控制多个 Unity 项目。
 - 🤖 **深度集成**：独家支持 **Antigravity Slash Commands**，解锁 `/unity-skills` 交互新体验。
 - 🔌 **全环境兼容**：完美支持 Claude Code, Antigravity, Gemini CLI 等主流 AI 终端。
 - 🎥 **Cinemachine 2.x/3.x 双版本支持**：自动检测 Unity 版本并安装对应 Cinemachine，支持 **MixingCamera**, **ClearShot**, **TargetGroup**, **Spline** 等高级相机控制。
-- 🔗 **超长任务稳定连接**：请求超时用户可配置（默认 60 分钟），Domain Reload 后自动恢复同一端口，Python 客户端自动同步超时配置，彻底解决长时间任务断连问题。
+- 🔗 **超长任务稳定连接**：请求超时用户可配置（默认 60 分钟），Domain Reload 后自动恢复文件传输服务，命令落盘后会持续等待 Unity 完成。
 
 ---
 
@@ -50,7 +50,7 @@
 
 ## 🏁 快速开始
 
-> **总体路线**：安装 Unity 插件 → 开启 UnitySkills 服务器 → AI 使用 Skill
+> **总体路线**：安装 Unity 插件 → 开启 UnitySkills 传输服务 → AI 使用 Skill
 
 <p align="center">
   <img src="docs/installation-demo.gif" alt="一键安装演示" width="800">
@@ -76,7 +76,7 @@ https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity#v1.4.0
 
 > 📦 所有版本包可在 [Releases](https://github.com/Besty0728/Unity-Skills/releases) 页面下载
 
-### 2. 启动服务
+### 2. 启动传输服务
 在 Unity 中点击菜单：`Window > UnitySkills > Start Server`
 
 ### 3. 一键配置 AI Skills

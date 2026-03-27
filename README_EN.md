@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>REST API-based AI-driven Unity Editor Automation Engine</b><br>
+  <b>File-queue-based AI-driven Unity Editor Automation Engine</b><br>
   <i>Let AI control Unity scenes directly through Skills</i>
 </p>
 
@@ -25,13 +25,13 @@ This project is a deep refactoring and feature extension based on the excellent 
 ## 🚀 Core Features
 
 - ⚡ **Ultimate Efficiency**: Supports **Result Truncation** and **SKILL.md** optimization to maximize token savings.
-- 🛠️ **Comprehensive Toolkit**: Built-in 431 Skills with **Batch** operations, significantly reducing HTTP overhead and improving execution efficiency.
+- 🛠️ **Comprehensive Toolkit**: Built-in 431 Skills with **Batch** operations, improving local automation throughput.
 - 🛡️ **Safety First**: Supports **Transactional** (atomic operations) with automatic rollback on failure, leaving no residue in scenes.
-- 🌍 **Multi-Instance Support**: Automatic port discovery and global registry, enabling simultaneous control of multiple Unity projects.
+- 🌍 **Multi-Instance Support**: Automatic queue discovery and global registry, enabling simultaneous control of multiple Unity projects.
 - 🤖 **Deep Integration**: Exclusive support for **Antigravity Slash Commands**, unlocking the `/unity-skills` interactive experience.
 - 🔌 **Full Environment Compatibility**: Perfect support for Claude Code, Antigravity, Gemini CLI, and other mainstream AI terminals.
 - 🎥 **Cinemachine 2.x/3.x Dual Version Support**: Auto-detects Unity version and installs the corresponding Cinemachine, supporting **MixingCamera**, **ClearShot**, **TargetGroup**, **Spline**, and other advanced camera controls.
-- 🔗 **Stable Long-Running Tasks**: User-configurable request timeout (default 60 minutes), automatic port recovery after Domain Reload, Python client auto-syncs timeout from server, fully resolving disconnection issues during long tasks.
+- 🔗 **Stable Long-Running Tasks**: User-configurable request timeout (default 60 minutes), automatic file transport recovery after Domain Reload, and disk-backed commands that survive busy editor periods.
 
 ---
 
@@ -50,7 +50,7 @@ This project has been deeply optimized for the following environments to ensure 
 
 ## 🏁 Quick Start
 
-> **Overview**: Install Unity Plugin → Start UnitySkills Server → AI Uses Skills
+> **Overview**: Install Unity Plugin → Start UnitySkills transport → AI Uses Skills
 
 <p align="center">
   <img src="docs/installation-demo.gif" alt="一键安装演示" width="800">
@@ -76,7 +76,7 @@ https://github.com/Besty0728/Unity-Skills.git?path=/SkillsForUnity#v1.4.0
 
 > 📦 All version packages are available on the [Releases](https://github.com/Besty0728/Unity-Skills/releases) page
 
-### 2. Start Server
+### 2. Start Transport
 In Unity, click menu: `Window > UnitySkills > Start Server`
 
 ### 3. One-Click AI Skills Configuration
